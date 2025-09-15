@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Business DashBoard</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+</head>
+<body>
+<h1>Dashboard</h1>
+<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+</th:block>
+
+<a th:href="@{/business/service/businessReg}">Register Business</a>
+<br>
+<a th:href="@{/business/service/addRoom}">Add Room</a>
+<br>
+<a th:href="@{/business/service/changeRoomStatus}">Change Room Status</a>
+<br>
+<a th:href="@{/business/service/changeRoomInfo}">Change Room Information</a>
+<br>
+<a th:href="@{/business/service/findBookedRooms}">Booked Rooms</a>
+<br>
+<div>
+    <a th:href="@{/common/resource/dashboard}">Back</a>
+</div>
+<br>
+<a th:href="@{/common/resource/logout}">Logout</a>
+
+</body>
+</html>

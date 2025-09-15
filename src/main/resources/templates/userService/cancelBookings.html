@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cancel Bookings</title>
+    <link rel="stylesheet" th:href="@{/css/table.css}">
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+
+</head>
+<body>
+
+<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+</th:block>
+
+<table th:if="${bookingsAndRefundableAmt.size() > 0}">
+    <thead>
+    <tr>
+        <th>SNo</th>
+        <th>Business</th>
+        <th>City</th>
+        <th>Location</th>
+        <th>Room No</th>
+        <th>Booking Date</th>
+        <th>Expected Checkout Date</th>
+        <th> Amount paid for Booking Room</th>
+        <th>Remaining Duration amount-Penalty(10% Of Remaining Duration amount) </th>
+        <th> Expected amount you will get(if cancelled now)</th>
+        <th>Cancel Booking</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="booking,bookingStat:${bookingsAndRefundableAmt}">
+        <td th:text="${bookingStat.count}"></td>
+        <td th:text="${business.businessName}"></td>
+        <td th:text="${business.cityName}"></td>
+        <td th:text="${business.location}"></td>
+        <td th:text="${booking.key.room.roomNumber}"></td>
+        <td th:text="${booking.key.bookingDate}"></td>
+        <td th:text="${booking.key.checkoutDate}"></td>
+        <td th:text="${booking.key.paymentAmt}"></td>
+        <td th:text="${booking.key.paymentAmt}-${booking.value}"></td>
+        <td th:text="${booking.value}"> </td>
+        <td>
+            <form th:action="@{/user/service/cancelBooking}" method="post">
+                <input type="hidden" name="roomNumber" th:value="${booking.key.room.roomNumber}">
+                <button type="submit" th:onclick="|return confirm('Do you really want to cancel booking for Room number'+${booking.key.room.roomNumber}+'?);'+|">Submit</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<a th:href="@{/user/service/businessPage}">Back</a>
+<br>
+<h1 th:if="${bookingsAndRefundableAmt.size()==0}" style="color: red;">No Rooms Booked</h1>
+</body>
+</html>

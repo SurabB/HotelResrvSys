@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+</head>
+<body>
+<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+</th:block>
+<a th:href="@{/user/service/getBusiness}">Select Hotels</a>
+<br>
+<div>
+    <a th:href="@{/common/resource/dashboard}">Home</a>
+</div>
+<a th:href="@{/common/resource/logout}">Logout</a>
+<br>
+</body>
+</html>

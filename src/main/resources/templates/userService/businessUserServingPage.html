@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${business.businessName}"> Business Page</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+
+</head>
+<body>
+<h1 th:text="|Welcome to Hotel ${business.businessName}|"></h1>
+
+<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+</th:block>
+<br>
+<a th:href="@{/user/service/bookRoom}" target="_blank" rel="noopener noreferrer">
+    Book Room
+</a>
+<br>
+<a th:href="@{/user/service/cancelBooking}" target="_blank" rel="noopener noreferrer">Cancel Booking</a>
+
+<br>
+<a th:href="@{/user/resource/dashboard}">Back</a>
+<br>
+<a th:href="@{/user/service/logout}">Logout from business</a>
+
+
+</body>
+</html>

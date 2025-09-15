@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}" href="../static/css/login.css">
+    <title>Email Verification</title>
+    <style>
+        #pass_div input{
+            width:250px;
+            margin-left: 120px;
+        }
+    </style>
+</head>
+<body class="flex">
+<form  method="post" th:action="@{/common/resource/verifyEmail}">
+
+    <div id="container" class="flex ">
+        <h1>Verify Email</h1>
+        <div id="verificationToken_div" class="flex form_container">
+            <label for="verificationToken">Verification Token:</label>
+            <input class="form_container_child" type="text" id="verificationToken" name="verificationToken" placeholder="Enter your VerificationToken" required/>
+        </div>
+        <div id="pass_div" class="flex form_container">
+            <label for="password">Password </label>
+            <input class="form_container_child" type="password" id="password" name="password" placeholder="Enter Password" required />
+        </div>
+        <div id="submit_div">
+            <button type="submit">Verify</button>
+        </div>
+        <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+            <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+        </th:block>
+    </div>
+</form>
+</body>
+</html>

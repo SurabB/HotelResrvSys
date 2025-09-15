@@ -1,0 +1,10 @@
+.error_message{
+    color: red;
+    font-size: large;
+    font-weight: bold;
+}
+.success_message{
+    color: green;
+    font-weight: bold;
+    font-size: large;
+}

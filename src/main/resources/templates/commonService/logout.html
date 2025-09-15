@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Logout Page</title>
+    <link rel="stylesheet" th:href="@{/css/logout.css}" href="../../static/css/logout.css"/>
+</head>
+<body>
+<form th:action="@{/logoutUrl}" method="post">
+
+    <div id="log_container">
+        <div id="log_content">
+        <div id="log_header" class="flex">
+            <h1 style="color:black;">Are you sure you want to log out?</h1>
+        </div>
+        </div>
+
+        <div id="log_buttons">
+    <div id="log_submit" class="flex">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <button type="submit">Logout</button>
+    </div>
+            <div id="cancel_logout" class="flex">
+                <button type="button" onclick="history.back()">Cancel</button>
+            </div>
+
+    </div>
+    </div>
+
+</form>
+</body>
+</html>

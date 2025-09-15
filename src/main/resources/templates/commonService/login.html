@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body class="flex">
+<form th:action="@{/login}" method="post">
+
+    <div id="container" class="flex ">
+        <h1>Login Page</h1>
+    <div id="user_div" class="flex form_container">
+        <label for="username">Username </label>
+        <input class="form_container_child" type="email" id="username" name="username" placeholder="Enter your email" required/>
+    </div>
+    <div id="pass_div" class="flex form_container">
+        <label for="password">Password </label>
+        <input class="form_container_child" type="password" id="password" name="password" placeholder="Enter Password" required />
+    </div>
+    <div id="submit_div">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit">Login</button>
+    </div>
+        <div id="forgotPass_div">
+    <a th:href="@{/common/resource/forgotPasswordEmail}">Forgot Password</a>
+        </div>
+    <div class="message_shift" id="loginFailure_div" th:if="${login_failure}">
+        <p style="color:red; font-weight: bold;" th:text="${login_failure}"> </p>
+    </div>
+
+
+    <div class="message_shift" id="logoutMessage_div" th:if="${logout_success}">
+        <p style="color:green; font-size: large" th:text="${logout_success}"></p>
+    </div>
+
+    <div class="message_shift" id="successMessage_div" th:if="${success != null}">
+        <p th:text="${success}"
+            th:classappend="success-message"></p>
+
+    </div>
+    </div>
+
+</form>
+</body>
+</html>

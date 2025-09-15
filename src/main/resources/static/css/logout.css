@@ -1,0 +1,68 @@
+#log_submit{
+height:40px;
+    width:100px;
+
+
+}
+#cancel_logout{
+    height: 40px;
+    width: 90px;
+}
+#cancel_logout button{
+    height: 100%;
+    width:100% ;
+    border-radius: 8px;
+
+
+
+}
+#log_submit button{
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+    background-color: #037bfd;
+
+
+
+
+}
+#log_container{
+    height: 300px;
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: snow;
+}
+.flex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#log_buttons{
+    height: 50%;
+    width:100%;
+    display: flex;
+    justify-content: space-around;
+   align-items:end ;
+}
+#image{
+    background-image: url('../image/springBoot_logo.webp');
+    background-repeat: no-repeat; /* Prevents image from repeating */
+    background-size: contain; /* Ensures image covers the entire background */
+    background-position: center;
+    margin-top: 2rem;
+    height: 50%;
+    width: 40%;
+
+}
+.log_content{
+    height:90px;
+    width:225px;
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items:flex-end;
+
+}

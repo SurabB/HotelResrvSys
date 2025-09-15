@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/emailFragment.css}">
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+
+    <title>Admin Registration</title>
+</head>
+<body>
+<div th:replace="~{fragments/emailFragment :: registrationForm('Admin Registration', @{/admin/resource/reg})}"></div>
+<div>
+    <a th:href="@{/admin/resource/dashboard}">Back</a>
+</div>
+
+</body>
+</html>

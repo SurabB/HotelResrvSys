@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Booked Room Information</title>
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+    <style>
+        table {
+
+            border-collapse: collapse;
+        }
+        th, td{
+            border:2px solid black;
+            padding: 24px;
+
+        }
+    </style>
+</head>
+<body>
+
+<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+</th:block>
+
+<table th:if="${bookedRooms.size() > 0}">
+    <thead>
+    <tr>
+        <th>SNo</th>
+        <th>RoomNo</th>
+        <th>PricePerHour</th>
+        <th>Room Type</th>
+        <th>Active Status</th>
+        <th>Booking Date</th>
+        <th>Checked Out Date</th>
+        <th>Paid amount</th>
+        <th>Checked Out In</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="element, roomStat : ${bookedRooms}">
+      <td th:text="${roomStat.count}"></td>
+        <td th:text="${element.key.roomNumber}"></td>
+        <td th:text="${element.key.pricePerHour}"></td>
+        <td th:text="${element.key.roomType}"></td>
+        <td th:text="${element.key.roomIsActive}"></td>
+        <td th:text="${element.value.bookingDate}"></td>
+        <td th:text="${element.value.checkoutDate}"></td>
+        <td th:text="${element.value.paymentAmt}"></td>
+
+
+
+    </tr>
+
+
+    </tbody>
+
+</table>
+<br>
+<a th:href="@{/business/resource/dashboard}">Back</a>
+<br>
+<h1 th:if="${bookedRooms.size()==0}" style="color: red;">No Active Bookings </h1>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Approve Users</title>
+    <link rel="stylesheet" th:href="@{/css/table.css}">
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+</head>
+<body>
+
+<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+</th:block>
+
+<table th:if="${allUnapprovedUsers.size() > 0}">
+    <thead>
+    <tr>
+        <th>SNo</th>
+        <th>email</th>
+        <th>Role</th>
+        <th>Approve</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user,userStat:${allUnapprovedUsers}">
+        <td th:text="${userStat.count}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.role}"></td>
+        <td>
+            <form th:action="@{/admin/resource/adminApprove}" method="post">
+                <input type="hidden" name="email" th:value="${user.email}" />
+                <button type="submit">Approve</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div>
+    <a th:href="@{/admin/resource/dashboard}">Back</a>
+</div>
+<h1 th:if="${allUnapprovedUsers.size()==0}" style="color: green;">All users have admin Permission</h1>
+</body>
+</html>

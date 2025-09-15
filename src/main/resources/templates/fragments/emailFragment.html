@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragment</title>
+</head>
+<body>
+<div th:fragment="registrationForm(title, actionUrl)">
+<div class="form_container">
+    <h2 th:text="${title}"></h2>
+    <form th:action="${actionUrl}" method="post">
+    <div class="email_container">
+        <label for="email">Email  </label>
+        <input type="text" id="email" name="email" placeholder="Enter your email" >
+
+    </div>
+    <div id="submit_div">
+        <button type="submit">Submit</button>
+    </div>
+    </form>
+<br><br>
+    <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+        <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+    </th:block>
+</div>
+</div>
+</body>
+
+</html>

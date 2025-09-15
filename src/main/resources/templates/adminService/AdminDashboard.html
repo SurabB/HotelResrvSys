@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+</th:block>
+
+
+<a th:href="@{/admin/resource/reg}">Register Admin</a>
+<br>
+<a th:href="@{/admin/resource/adminApprove}">Approve Users</a>
+<br>
+<a th:href="@{/admin/resource/adminDisprove}">Disapprove Users</a>
+<br>
+<a th:href="@{/common/resource/dashboard}">Home Page</a>
+<br>
+<a th:href="@{/common/resource/logout}">Logout</a>
+
+
+
+</body>
+</html>

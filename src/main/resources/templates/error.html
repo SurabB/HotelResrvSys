@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error Page</title>
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+    <style>
+        .error_container{
+            margin-top: 100px;
+            height: 200px;
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+       .error{
+           color: #d31010;
+           font-size: larger;
+           font-weight: bold;
+
+       }
+       body{
+           display: flex;
+           justify-content: center;
+           align-items: center;
+       }
+       #go_back{
+           display: inline-block;
+           margin: 10px 0;
+           padding: 10px 15px;
+           text-decoration: none;
+           color: #fff;
+           background-color: #037bfd;
+           border-radius: 5px;
+           transition: background-color 0.2s ease;
+       }
+    </style>
+</head>
+<body>
+<div class="error_container">
+<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+</th:block>
+
+<div th:if="${authError!=null}">
+    <p class="error" th:text="${authError}"></p>
+</div>
+<div th:if="${failure!=null}">
+    <p  class="error" th:text="${failure}"></p>
+</div>
+<th:block th:if="${error!=null}">
+    <p class="error" th:text="${status} + ' - ' + ${error}"></p>
+</th:block>
+
+<a id="go_back" href="javascript:history.back()">Go Back</a>
+
+</div>
+</body>
+</html>

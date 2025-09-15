@@ -1,0 +1,62 @@
+
+
+.success-message{
+    color: green;
+}
+.flex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#container{
+    width: 500px;
+    height:400px;
+    background-color: #f0f0f0;
+    flex-direction: column;
+
+}
+.form_container{
+ height: 50px;
+ width: 390px;
+    font-size:large;
+
+}
+.message_shift{
+    margin-left: 80px;
+}
+.form_container_child{
+    width:80%;
+    height: 70%;
+    margin-left: 8px;
+    border-radius: 8px;
+}
+#submit_div{
+    height:50px;
+    width:315px;
+    margin-top: 15px;
+    margin-left: 70px;
+
+
+}
+#submit_div>button{
+    font-size:100%;
+    border-color: #037bfd;
+    color: white;
+    height: 95%;
+    width: 100%;
+    background-color:royalblue;
+    border-radius: 8px;
+
+}
+#forgotPass_div{
+ margin-left: 85px;
+    margin-top: 15px;
+
+}
+#forgotPass_div> a{
+    text-decoration: none;
+    color: black;
+    font-weight:bold;
+
+
+}
