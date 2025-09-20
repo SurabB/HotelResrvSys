@@ -108,14 +108,6 @@ public class BusinessService {
         Long userProvideNumber = roomUpdateDto.getRoomNumber();
 
         if(userProvideNumber!= null&&!userProvideNumber.equals(room.getRoomNumber())&&userProvideNumber>0){
-
-            //check if userProvideNumber room number already exist for that business in db
-            boolean roomExist = roomRepo.existRoomByRoomNumberAndBusinessEmail(userProvideNumber, businessEmail);
-            if(roomExist){
-                //if  room exist throws exception
-                throw new DataIntegrityViolationException("Room number already exists");
-            }
-            //else set new number
             room.setRoomNumber(userProvideNumber);
       }
 

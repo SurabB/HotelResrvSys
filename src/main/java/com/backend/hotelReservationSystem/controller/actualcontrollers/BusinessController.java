@@ -123,12 +123,9 @@ public class BusinessController {
     @PostMapping("/changeRoomInfo")
     public  String changeRoomInfo(@Valid @ModelAttribute RoomUpdateDto roomUpdateDto, BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes){
         if (bindingResult.hasErrors()){
-            System.out.println("inside binding error");
             throw new CustomMethodArgFailedException("redirect:/business/service/changeRoomInfo",bindingResult);
         }
         try {
-
-            System.out.println("change room info"+roomUpdateDto.getRoomNumber());
             boolean changed = businessService.changeRoomInfo(roomUpdateDto, principal.getName());
             if (changed) {
                 redirectAttributes.addFlashAttribute("success", "Room info changed successfully!");
