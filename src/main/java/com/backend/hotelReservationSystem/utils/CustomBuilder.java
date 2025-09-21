@@ -70,6 +70,7 @@ return  ReservationTable.builder()
     }
     public static ReservationHistory createReservationHistoryObj(ReservationTable reservationTable){
        return  ReservationHistory.builder()
+               .checkInDate(reservationTable.getCheckingDate())
                 .createdAt(LocalDateTime.now())
                 .user(reservationTable.getUser())
                 .room(reservationTable.getRoom())

@@ -12,6 +12,7 @@ import com.backend.hotelReservationSystem.exceptionClasses.InsufficientBalanceEx
 import com.backend.hotelReservationSystem.exceptionClasses.RoomNotFoundException;
 import com.backend.hotelReservationSystem.repo.ReservationRepo;
 import com.backend.hotelReservationSystem.utils.BookingCancellationPolicy;
+import com.backend.hotelReservationSystem.utils.BookingPolicy;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -30,42 +31,42 @@ import java.util.Optional;
 public class UserService {
     private final ReservationRepo reservationRepo;
 
-    public List<Room> findAvailableRooms(String businessUuid){
-        return reservationRepo.findAvailableRoomsByUuid(businessUuid, ReservationStatus.BOOKED);
+    public List<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime){
+        return reservationRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate());
 
     }
 
     @Transactional
-    public void bookRoom(BookRoomDto bookRoomDto, User user,String businessUuid) {
-
-        // 1. find the room
-        Room room = reservationRepo.findRoomExistence(businessUuid, bookRoomDto.getRoomNumber(), ReservationStatus.BOOKED)
-                .orElseThrow(() -> new RoomNotFoundException("Room not found or already booked or not available for renting"));
-
-        // 2. calculate total price and check user balance
-        BigDecimal totalPrice = calculateTotalPriceIfUserHasBalance(
-                room.getPricePerHour(), bookRoomDto.getBookingTime(), user.getBankBalance())
-                .orElseThrow(() -> new InsufficientBalanceException("Insufficient balance in bank"));
-
-        // 3. get business id
-        Long businessId = room.getBusiness().getUser().getUserId();
-
-        // 4. deduct user balance
-        boolean userSuccess = reservationRepo.deductUserBalance(user.getUserId(), totalPrice) > 0;
-        if (!userSuccess) {
-            throw new InsufficientBalanceException("Insufficient balance or user not found");
-        }
-
-        // 5. add business balance
-        boolean businessSuccess = reservationRepo.addBusinessBalance(businessId, totalPrice) > 0;
-        if (!businessSuccess) {
-            throw new RuntimeException("Business not found or balance update failed");
-        }
-
-        // 6. save reservation
-        ReservationTable reservation = CustomBuilder.createReservationObj(bookRoomDto.getBookingTime(), user, room,totalPrice);
-        reservationRepo.save(reservation);
-    }
+//    public void bookRoom(BookRoomDto bookRoomDto, User user,String businessUuid) {
+//
+//        // 1. find the room
+//        Room room = reservationRepo.findRoomExistence(businessUuid, bookRoomDto.getRoomNumber(), ReservationStatus.BOOKED)
+//                .orElseThrow(() -> new RoomNotFoundException("Room not found or already booked or not available for renting"));
+//
+//        // 2. calculate total price and check user balance
+//        BigDecimal totalPrice = calculateTotalPriceIfUserHasBalance(
+//                //exp--room.getPricePerHour(), bookRoomDto.getBookingTime(), user.getBankBalance())
+//                .orElseThrow(() -> new InsufficientBalanceException("Insufficient balance in bank"));
+//
+//        // 3. get business id
+//        Long businessId = room.getBusiness().getUser().getUserId();
+//
+//        // 4. deduct user balance
+//        boolean userSuccess = reservationRepo.deductUserBalance(user.getUserId(), totalPrice) > 0;
+//        if (!userSuccess) {
+//            throw new InsufficientBalanceException("Insufficient balance or user not found");
+//        }
+//
+//        // 5. add business balance
+//        boolean businessSuccess = reservationRepo.addBusinessBalance(businessId, totalPrice) > 0;
+//        if (!businessSuccess) {
+//            throw new RuntimeException("Business not found or balance update failed");
+//        }
+//
+//        // 6. save reservation
+//        ReservationTable reservation = CustomBuilder.createReservationObj(bookRoomDto.getBookingTime(), user, room,totalPrice);
+//        reservationRepo.save(reservation);
+//    }
 
     private Optional<BigDecimal> calculateTotalPriceIfUserHasBalance(
             BigDecimal pricePerHour, Integer bookingTimeInHrs, BigDecimal userBalance) {

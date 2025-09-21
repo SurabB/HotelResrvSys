@@ -19,8 +19,11 @@ public class ReservationTable {
     @Column(name = "reservation_id")
     private Long reservationId;
 
-    @Column(name = "booking_date",nullable = false)
-   private LocalDateTime bookingDate;
+    @Column(name="booking_date",nullable = false)
+    private LocalDateTime bookingDate;
+
+    @Column(name = "checking_date",nullable = false)
+   private LocalDateTime checkingDate;
 
     @Column(name = "checkout_date",nullable = false)
    private LocalDateTime checkoutDate;

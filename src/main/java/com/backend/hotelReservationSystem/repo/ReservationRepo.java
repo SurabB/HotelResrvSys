@@ -11,12 +11,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 @Repository
 public interface ReservationRepo extends JpaRepository<ReservationTable,Long> {
-  @Query("select r from Room r join r.business b join b.user u where b.businessUuid=:businessUuid and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.status=:reservationStatus)")
-    List<Room> findAvailableRoomsByUuid(String businessUuid, ReservationStatus reservationStatus);
+  @Query("select r from Room r join r.business b join b.user u where b.businessUuid=:businessUuid and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate)")
+    List<Room> findAvailableRoomsByUuid(String businessUuid, LocalDateTime checkInDate,LocalDateTime checkoutDate);
 
     @Query("select r from Room r join r.business b join b.user u where u.email=:userEmail and u.isActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.status=:reservationStatus)")
     List<Room> findAvailableRoomsByEmail(String userEmail, ReservationStatus reservationStatus);
