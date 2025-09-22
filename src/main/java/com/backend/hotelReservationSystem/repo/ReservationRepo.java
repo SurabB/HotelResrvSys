@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Optional;
 @Repository
 public interface ReservationRepo extends JpaRepository<ReservationTable,Long> {
-  @Query("select r from Room r join r.business b join b.user u where b.businessUuid=:businessUuid and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate)")
-    List<Room> findAvailableRoomsByUuid(String businessUuid, LocalDateTime checkInDate,LocalDateTime checkoutDate);
+  @Query("select r from Room r join r.business b join b.user u where b.businessUuid=:businessUuid and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate and (rt.reservationStatus=:booked or rt.reservationStatus=:checkedIn))")
+    List<Room> findAvailableRoomsByUuid(String businessUuid, LocalDateTime checkInDate,LocalDateTime checkoutDate,ReservationStatus booked,ReservationStatus checkedIn);
 
     @Query("select r from Room r join r.business b join b.user u where u.email=:userEmail and u.isActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.status=:reservationStatus)")
     List<Room> findAvailableRoomsByEmail(String userEmail, ReservationStatus reservationStatus);
 
-    @Query("select r from Room r join r.business b join b.user u where b.businessUuid=:businessUuid and r.roomNumber=:roomNo and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.status=:reservationStatus)")
-    Optional<Room> findRoomExistence(String businessUuid, Long roomNo, ReservationStatus reservationStatus);
+    @Query("select r from Room r join r.business b join b.user u where b.businessId=:businessId and r.roomNumber=:roomNo and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate and (rt.reservationStatus=:booked or rt.reservationStatus=:checkedIn))")
+    Optional<Room> findRoomExistence(Long businessId, Long roomNo, LocalDateTime checkInDate,LocalDateTime checkoutDate,ReservationStatus booked,ReservationStatus checkedIn);
 
 
     @Modifying
@@ -42,11 +42,11 @@ public interface ReservationRepo extends JpaRepository<ReservationTable,Long> {
     @Query("select b from Business b join b.user u where u.isActive=true")
     List<Business> findAvailableBusiness();
 
-@Query("select rt from ReservationTable rt join rt.user u  join fetch  rt.room r join r.business b where u.email=:userEmail and b.businessId=:businessId and rt.status=:reservationStatus")
-    List<ReservationTable> findBookingsOfParticularUser(String userEmail, Long businessId, ReservationStatus reservationStatus);
+@Query("select rt from ReservationTable rt join rt.user u  join fetch  rt.room r join r.business b where u.email=:userEmail and b.businessId=:businessId and rt.status=:booked")
+    List<ReservationTable> findBookingsOfParticularUser(String userEmail, Long businessId, ReservationStatus booked);
 
-@Query("select rt from ReservationTable rt join fetch rt.room r join rt.user u join r.business b where b.businessId=:businessId and r.roomNumber=:roomNo and u.email=:userEmail and b.user.isActive=true and rt.status=:status ")
-    Optional<ReservationTable> findBookedRoomOfParticularUser(Long roomNo, String userEmail, Long businessId,ReservationStatus status);
+@Query("select rt from ReservationTable rt join fetch rt.room r join rt.user u join r.business b where b.businessId=:businessId and r.roomNumber=:roomNo and u.email=:userEmail and b.user.isActive=true and rt.status=:booked and rt.checkInDate=:checkInDate and rt.checkoutDate=:checkoutDate")
+    Optional<ReservationTable> findBookedRoomOfParticularUser(Long roomNo,LocalDateTime checkInDate,LocalDateTime checkoutDate, String userEmail, Long businessId,ReservationStatus booked);
 
 @Modifying
 @Query("update User u set u.bankBalance=u.bankBalance+:priceToReturn where u.email=:userEmail and u.isActive=true")

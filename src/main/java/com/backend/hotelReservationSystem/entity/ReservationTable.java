@@ -22,11 +22,14 @@ public class ReservationTable {
     @Column(name="booking_date",nullable = false)
     private LocalDateTime bookingDate;
 
-    @Column(name = "checking_date",nullable = false)
-   private LocalDateTime checkingDate;
+    @Column(name = "check_in_date",nullable = false)
+   private LocalDateTime checkInDate;
 
     @Column(name = "checkout_date",nullable = false)
    private LocalDateTime checkoutDate;
+
+    @Column(name="price_per_hr",nullable = false)
+    private BigDecimal pricePerHr;
 
    @Enumerated(EnumType.STRING)
    @Column(name = "reservation_status",nullable = false)

@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class BookRoomDto {
-    @NotNull(message = "Business does not exist")
-    Long  roomNumber;
 
     @Positive(message = "Booking Time must be greater than 0")
     @NotNull(message = "Provide booking time")

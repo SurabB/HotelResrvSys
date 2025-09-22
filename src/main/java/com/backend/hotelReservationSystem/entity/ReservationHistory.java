@@ -40,10 +40,9 @@ public class ReservationHistory {
     private ReservationStatus status;
 
     private LocalDateTime bookingDate;
-
     private LocalDateTime checkInDate;
     private LocalDateTime checkoutDate;
-
+   private BigDecimal pricePerHour;
     private BigDecimal paymentAmount;
 
     private LocalDateTime createdAt;

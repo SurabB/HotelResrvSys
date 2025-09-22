@@ -9,7 +9,7 @@ import java.time.Duration;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingCancellationPolicy {
-    private static final  BigDecimal PENALTY_PERCENT=new BigDecimal(10);
+    private static final  BigDecimal PENALTY_PERCENT=new BigDecimal(5);
     public static BigDecimal calculateCancellationPrice(Duration duration,
                                                  BigDecimal pricePerHour) {
         long hours = duration.toHours();

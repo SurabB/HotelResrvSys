@@ -1,7 +1,7 @@
 package com.backend.hotelReservationSystem.service.actualservice;
 
+import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBookAndCancel;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
-import com.backend.hotelReservationSystem.dto.userServiceDto.BookRoomDto;
 import com.backend.hotelReservationSystem.dto.userServiceDto.FindBusinessDto;
 import com.backend.hotelReservationSystem.entity.Business;
 import com.backend.hotelReservationSystem.entity.ReservationTable;
@@ -32,52 +32,47 @@ public class UserService {
     private final ReservationRepo reservationRepo;
 
     public List<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime){
-        return reservationRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate());
+        return reservationRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
 
     }
 
     @Transactional
-//    public void bookRoom(BookRoomDto bookRoomDto, User user,String businessUuid) {
-//
+    public void bookRoom(RoomBookAndCancel bookRoomDto, User user, Long businessId) {
+          if(bookRoomDto.getCheckInTime().isAfter(LocalDateTime.now().plusMonths(2L))){
+              throw new BookingCancellationException("Cannot Book room. Booking is not allowed two or more months prior. ");
+          }
+
 //        // 1. find the room
-//        Room room = reservationRepo.findRoomExistence(businessUuid, bookRoomDto.getRoomNumber(), ReservationStatus.BOOKED)
-//                .orElseThrow(() -> new RoomNotFoundException("Room not found or already booked or not available for renting"));
+        Room room = reservationRepo.findRoomExistence(businessId, bookRoomDto.getRoomNumber(), bookRoomDto.getCheckInTime(),bookRoomDto.getCheckoutTime(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN)
+                .orElseThrow(() -> new RoomNotFoundException("Room not found or already rented or not available for renting"));
 //
-//        // 2. calculate total price and check user balance
-//        BigDecimal totalPrice = calculateTotalPriceIfUserHasBalance(
-//                //exp--room.getPricePerHour(), bookRoomDto.getBookingTime(), user.getBankBalance())
-//                .orElseThrow(() -> new InsufficientBalanceException("Insufficient balance in bank"));
+//        2. calculate total price
+
+        BigDecimal totalPrice = BookingPolicy.roomPrizeForDuration(
+                bookRoomDto.getCheckInTime(),bookRoomDto.getCheckoutTime(),room.getPricePerHour())
+                .orElseThrow(() -> new BookingCancellationException("Invalid duration provided for booking"));
+
+
 //
-//        // 3. get business id
-//        Long businessId = room.getBusiness().getUser().getUserId();
 //
 //        // 4. deduct user balance
-//        boolean userSuccess = reservationRepo.deductUserBalance(user.getUserId(), totalPrice) > 0;
-//        if (!userSuccess) {
-//            throw new InsufficientBalanceException("Insufficient balance or user not found");
-//        }
-//
+        boolean userSuccess = reservationRepo.deductUserBalance(user.getUserId(), totalPrice) > 0;
+        if (!userSuccess) {
+            throw new InsufficientBalanceException("Insufficient balance or user not found");
+        }
+
 //        // 5. add business balance
-//        boolean businessSuccess = reservationRepo.addBusinessBalance(businessId, totalPrice) > 0;
-//        if (!businessSuccess) {
-//            throw new RuntimeException("Business not found or balance update failed");
-//        }
+        boolean businessSuccess = reservationRepo.addBusinessBalance(businessId, totalPrice) > 0;
+        if (!businessSuccess) {
+            throw new RuntimeException("Business not found or balance update failed");
+        }
 //
 //        // 6. save reservation
-//        ReservationTable reservation = CustomBuilder.createReservationObj(bookRoomDto.getBookingTime(), user, room,totalPrice);
-//        reservationRepo.save(reservation);
-//    }
-
-    private Optional<BigDecimal> calculateTotalPriceIfUserHasBalance(
-            BigDecimal pricePerHour, Integer bookingTimeInHrs, BigDecimal userBalance) {
-    // 1 calculates total price for room reservation
-        BigDecimal totalPrice = pricePerHour.multiply(BigDecimal.valueOf(bookingTimeInHrs));
-
-    // 2 returns total price if user has sufficient balance otherwise returns an empty optional
-        return totalPrice.compareTo(userBalance) <= 0
-                ? Optional.of(totalPrice)
-                : Optional.empty();
+        ReservationTable reservation = CustomBuilder.createReservationObj(bookRoomDto, user, room,totalPrice);
+        reservationRepo.save(reservation);
     }
+
+
 
 
     public Optional<Business> findBusiness(FindBusinessDto findbusinessdto) {
@@ -93,11 +88,8 @@ public class UserService {
         List<ReservationTable> bookingsOfParticularUser = reservationRepo.findBookingsOfParticularUser(name, businessId, ReservationStatus.BOOKED);
         HashMap<ReservationTable,BigDecimal> map=new HashMap<>();
          bookingsOfParticularUser.forEach(booking -> {
-                    LocalDateTime bookingDate = booking.getBookingDate();
-                    LocalDateTime checkoutDate = booking.getCheckoutDate();
-                    Duration duration = Duration.between(bookingDate, checkoutDate);
+                    Duration duration = Duration.between(booking.getCheckInDate(), booking.getCheckoutDate());
                     BigDecimal pricePerHour = booking.getRoom().getPricePerHour();
-                    BigDecimal paymentAmt = booking.getPaymentAmt();
                     BigDecimal refundableAmt = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
                     map.put(booking,refundableAmt);
                 }
@@ -106,20 +98,13 @@ public class UserService {
 
     }
 
-    public void cancelBooking(Long roomNo, String userEmail, Long businessId) {
-        Optional<ReservationTable> bookedRoomOfParticularUser = reservationRepo.findBookedRoomOfParticularUser(roomNo, userEmail, businessId, ReservationStatus.BOOKED);
+    public void cancelBooking(RoomBookAndCancel
+            roomBookingCancel, String userEmail, Long businessId) {
+        Optional<ReservationTable> bookedRoomOfParticularUser = reservationRepo.findBookedRoomOfParticularUser(roomBookingCancel.getRoomNumber(),roomBookingCancel.getCheckInTime(),roomBookingCancel.getCheckoutTime(), userEmail, businessId, ReservationStatus.BOOKED);
         ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Booking failed either due to no active booking or due to invalid credentials "));
-        LocalDateTime checkoutDate = reservationTable.getCheckoutDate();
-        LocalDateTime now = LocalDateTime.now();
-        if (!checkoutDate.isAfter(now.plusHours(1))) {
-            throw new BookingCancellationException("Cannot cancel booking within 1 hour of checkout or after checkout.");
-        }
-        Room room = reservationTable.getRoom();
-        BigDecimal pricePerHour = room.getPricePerHour();
+        BigDecimal pricePerHour = reservationTable.getPricePerHr();
         BigDecimal userPaidAmt = reservationTable.getPaymentAmt();
-
-        //compare checkoutDate and now() and retrieve no.of hours left with minutes
-        Duration duration = Duration.between(now, checkoutDate);
+        Duration duration = Duration.between(reservationTable.getCheckInDate(), reservationTable.getCheckoutDate());
 
         BigDecimal priceToReturn = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
         int userSuccess = reservationRepo.addUserBalance(priceToReturn, userEmail);
