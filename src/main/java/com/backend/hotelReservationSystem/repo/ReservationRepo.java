@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Optional;
 @Repository
 public interface ReservationRepo extends JpaRepository<ReservationTable,Long> {
-  @Query("select r from Room r join r.business b join b.user u where b.businessUuid=:businessUuid and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate and (rt.reservationStatus=:booked or rt.reservationStatus=:checkedIn))")
+  @Query("select r from Room r join r.business b join b.user u where b.businessUuid=:businessUuid and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate and (rt.status=:booked or rt.status=:checkedIn))")
     List<Room> findAvailableRoomsByUuid(String businessUuid, LocalDateTime checkInDate,LocalDateTime checkoutDate,ReservationStatus booked,ReservationStatus checkedIn);
 
     @Query("select r from Room r join r.business b join b.user u where u.email=:userEmail and u.isActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.status=:reservationStatus)")
     List<Room> findAvailableRoomsByEmail(String userEmail, ReservationStatus reservationStatus);
 
-    @Query("select r from Room r join r.business b join b.user u where b.businessId=:businessId and r.roomNumber=:roomNo and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate and (rt.reservationStatus=:booked or rt.reservationStatus=:checkedIn))")
+    @Query("select r from Room r join r.business b join b.user u where b.businessId=:businessId and r.roomNumber=:roomNo and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate and (rt.status=:booked or rt.status=:checkedIn))")
     Optional<Room> findRoomExistence(Long businessId, Long roomNo, LocalDateTime checkInDate,LocalDateTime checkoutDate,ReservationStatus booked,ReservationStatus checkedIn);
 
 

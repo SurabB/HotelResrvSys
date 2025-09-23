@@ -1,6 +1,7 @@
 package com.backend.hotelReservationSystem.service.actualservice;
 
-import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBookAndCancel;
+import com.backend.hotelReservationSystem.dto.userServiceDto.CancelBookingDto;
+import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBook;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import com.backend.hotelReservationSystem.dto.userServiceDto.FindBusinessDto;
 import com.backend.hotelReservationSystem.entity.Business;
@@ -37,7 +38,7 @@ public class UserService {
     }
 
     @Transactional
-    public void bookRoom(RoomBookAndCancel bookRoomDto, User user, Long businessId) {
+    public void bookRoom(RoomBook bookRoomDto, User user, Long businessId) {
           if(bookRoomDto.getCheckInTime().isAfter(LocalDateTime.now().plusMonths(2L))){
               throw new BookingCancellationException("Cannot Book room. Booking is not allowed two or more months prior. ");
           }
@@ -98,7 +99,7 @@ public class UserService {
 
     }
 
-    public void cancelBooking(RoomBookAndCancel
+    public void cancelBooking(CancelBookingDto
             roomBookingCancel, String userEmail, Long businessId) {
         Optional<ReservationTable> bookedRoomOfParticularUser = reservationRepo.findBookedRoomOfParticularUser(roomBookingCancel.getRoomNumber(),roomBookingCancel.getCheckInTime(),roomBookingCancel.getCheckoutTime(), userEmail, businessId, ReservationStatus.BOOKED);
         ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Booking failed either due to no active booking or due to invalid credentials "));
@@ -110,10 +111,10 @@ public class UserService {
         int userSuccess = reservationRepo.addUserBalance(priceToReturn, userEmail);
         int businessSuccess = reservationRepo.deductBusinessBalance(businessId, priceToReturn);
         if (userSuccess!=1){
-            throw new RuntimeException("something went wrong while adding to user balance while booking cancellation");
+            throw new RuntimeException("something went wrong");
         }
         if (businessSuccess!=1){
-            throw new BookingCancellationException("something went wrong while booking cancellation");
+            throw new BookingCancellationException("something went wrong");
         }
         reservationTable.setStatus(ReservationStatus.CANCELLED);
         reservationTable.setCheckoutDate(LocalDateTime.now());

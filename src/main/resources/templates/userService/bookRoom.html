@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title> Book Room</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+
+</head>
+<body class="flex">
+<form th:action="@{/user/service/getRoom}" method="post">
+
+    <div id="container" class="flex ">
+        <h1>Book Room</h1>
+        <div id="bookingTime_div" class="flex form_container">
+            <label for="bookingTime">Booking Date </label>
+            <input class="form_container_child" type="date" id="bookingTime" name="bookingTime" placeholder="Day to Book" required/>
+        </div>
+        <div id="checkIn_div" class="flex form_container">
+            <label for="startingTime">CheckIn Time </label>
+            <input class="form_container_child" type="text" id="startingTime" name="startingTime" placeholder="Enter checkIn Time" required />
+        </div>
+        <div id="checkout_div" class="flex form_container">
+            <label for="endingTime">Checkout Time </label>
+            <input class="form_container_child" type="text" id="endingTime" name="endingTime" placeholder="Enter checkout Time" required />
+        </div>
+        <div id="submit_div">
+            <button type="submit">Submit</button>
+        </div>
+        <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+            <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+        </th:block>
+    </div>
+
+</form>
+</body>
+</html>

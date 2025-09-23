@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class RoomBookAndCancel {
+public class RoomBook {
     @NotNull(message = "Business does not exist")
     Long  roomNumber;
 

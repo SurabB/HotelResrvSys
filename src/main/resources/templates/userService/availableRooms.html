@@ -12,7 +12,7 @@
 <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
-<p th:if="${availableRooms.size() > 0}" th:text="|CheckInTime time-Checkout Time:${availableRooms.value.startingTime}-${availableRooms.value.endingTime}|"></p>
+<p th:if="${availableRooms.size() > 0}" th:text="|CheckInTime time-Checkout Time:${checkInDate}-${checkoutDate}|"></p>
 <table th:if="${availableRooms.size() > 0}">
         <tr>
             <th>SNo</th>
@@ -28,14 +28,14 @@
             <td th:text="${room.key.roomNumber}"></td>
             <td th:text="${room.key.roomType}"></td>
             <td th:text="${room.key.pricePerHour}"></td>
-            <td th:text="${room.value.totalPrice}"></td>
+            <td th:text="${room.value}"></td>
 
             <!-- Book Room Form -->
             <td>
                 <form th:action="@{/user/service/bookRoom}" method="post">
-                    <input type="hidden" name="roomNumber" th:value="${room.roomNumber}">
-                    <input type="hidden" name="checkInTime" th:value="${room.value.checkInTime}">
-                    <input type="hidden" name="checkoutTime" th:value="${room.value.checkoutTime}">
+                    <input type="hidden" name="roomNumber" th:value="${room.key.roomNumber}">
+                    <input type="hidden" name="checkInTime" th:value="${checkInDate}">
+                    <input type="hidden" name="checkoutTime" th:value="${checkoutDate}">
 
                     <button type="submit" onclick="return confirm('Do you really want to Book room');">Book</button>
                 </form>

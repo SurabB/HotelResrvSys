@@ -12,9 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 public class BookRoomDto {
 
-    @Positive(message = "Booking Time must be greater than 0")
     @NotNull(message = "Provide booking time")
-     @Max(value = 1000L)
+     @FutureOrPresent
     LocalDate bookingTime;
 
 

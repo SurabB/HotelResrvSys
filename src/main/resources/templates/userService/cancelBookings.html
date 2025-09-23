@@ -46,8 +46,8 @@
         <td>
             <form th:action="@{/user/service/cancelBooking}" method="post">
                 <input type="hidden" name="roomNumber" th:value="${booking.key.room.roomNumber}">
-                <input type="hidden" name="checkInTime" th:value="${booking.key.room.checkInDate}">
-                <input type="hidden" name="checkoutTime" th:value="${booking.key.room.checkoutDate}">
+                <input type="hidden" name="checkInTime" th:value="${booking.key.checkInDate}">
+                <input type="hidden" name="checkoutTime" th:value="${booking.key.checkoutDate}">
 
 
                 <button type="submit" th:onclick="|return confirm('Do you really want to cancel booking for Room number'+${booking.key.room.roomNumber}+'?);'+|">Submit</button>

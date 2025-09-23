@@ -18,7 +18,7 @@ public class BookingPolicy {
 
         LocalDateTime checkInTime = parseTime(bookRoomDto.getStartingTime(), bookRoomDto.getBookingTime());
         LocalDateTime checkoutTime=parseTime(bookRoomDto.getEndingTime(),bookRoomDto.getBookingTime());
-        if(checkInTime.isAfter(checkoutTime)||checkoutTime.isAfter(bookRoomDto.getBookingTime().atStartOfDay().plusHours(24))){
+        if(checkInTime.isBefore(LocalDateTime.now())||checkInTime.isAfter(checkoutTime)||checkoutTime.isAfter(bookRoomDto.getBookingTime().atStartOfDay().plusHours(24))){
             throw new BookingCancellationException("Invalid time limit provided. Time limit must be valid for a particular day.");
         }
         Duration duration = Duration.between(checkInTime, checkoutTime);

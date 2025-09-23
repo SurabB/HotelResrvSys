@@ -2,7 +2,7 @@ package com.backend.hotelReservationSystem.utils;
 
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
-import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBookAndCancel;
+import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBook;
 import com.backend.hotelReservationSystem.entity.*;
 import com.backend.hotelReservationSystem.enums.MailStatus;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
@@ -59,7 +59,7 @@ public class CustomBuilder {
                 .roomType(roomAcceptorDto.getRoomType())
                 .build();
     }
-    public static ReservationTable createReservationObj(RoomBookAndCancel bookRoomDtoPost, User user, Room room, BigDecimal totalPrice){
+    public static ReservationTable createReservationObj(RoomBook bookRoomDtoPost, User user, Room room, BigDecimal totalPrice){
 return  ReservationTable.builder()
         .user(user)
         .room(room)
