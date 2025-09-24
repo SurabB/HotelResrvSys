@@ -86,11 +86,11 @@ public class UserService {
     }
 
     public HashMap<ReservationTable,BigDecimal> findBookingsOfParticularUser(String name, Long businessId) {
-        List<ReservationTable> bookingsOfParticularUser = reservationRepo.findBookingsOfParticularUser(name, businessId, ReservationStatus.BOOKED);
+        List<ReservationTable> bookingsOfParticularUser = reservationRepo.findBookingsOfParticularUser(name, businessId, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
         HashMap<ReservationTable,BigDecimal> map=new HashMap<>();
          bookingsOfParticularUser.forEach(booking -> {
                     Duration duration = Duration.between(booking.getCheckInDate(), booking.getCheckoutDate());
-                    BigDecimal pricePerHour = booking.getRoom().getPricePerHour();
+                    BigDecimal pricePerHour = booking.getPricePerHr();
                     BigDecimal refundableAmt = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
                     map.put(booking,refundableAmt);
                 }
@@ -102,7 +102,10 @@ public class UserService {
     public void cancelBooking(CancelBookingDto
             roomBookingCancel, String userEmail, Long businessId) {
         Optional<ReservationTable> bookedRoomOfParticularUser = reservationRepo.findBookedRoomOfParticularUser(roomBookingCancel.getRoomNumber(),roomBookingCancel.getCheckInTime(),roomBookingCancel.getCheckoutTime(), userEmail, businessId, ReservationStatus.BOOKED);
-        ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Booking failed either due to no active booking or due to invalid credentials "));
+        ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Booking Cancellation failed either due to no active booking or user is already checked in or due to invalid credentials "));
+         if(reservationTable.getCheckInDate().minusMinutes(5).isBefore(LocalDateTime.now())){
+             throw new BookingCancellationException("Cannot cancel Booking after checkIn or five minutes before checkIn");
+         }
         BigDecimal pricePerHour = reservationTable.getPricePerHr();
         BigDecimal userPaidAmt = reservationTable.getPaymentAmt();
         Duration duration = Duration.between(reservationTable.getCheckInDate(), reservationTable.getCheckoutDate());

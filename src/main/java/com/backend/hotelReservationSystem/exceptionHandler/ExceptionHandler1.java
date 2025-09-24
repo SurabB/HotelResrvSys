@@ -31,7 +31,6 @@ public class ExceptionHandler1 {
     @ExceptionHandler(CustomMethodArgFailedException.class)
     public String handleMethodArgumentNotValid(CustomMethodArgFailedException e, RedirectAttributes redirectAttributes) {
         List<String> errors = e.getBindingResult().getAllErrors().stream().map(err -> err.getDefaultMessage()).toList();
-        System.out.println(errors);
         redirectAttributes.addFlashAttribute("fieldErrors", errors);
         return e.getRedirectionUrl();
 

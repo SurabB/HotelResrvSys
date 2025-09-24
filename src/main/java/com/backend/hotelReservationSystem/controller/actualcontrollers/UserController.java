@@ -12,8 +12,10 @@ import com.backend.hotelReservationSystem.exceptionClasses.*;
 import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.service.actualservice.UserService;
 import com.backend.hotelReservationSystem.utils.BookingPolicy;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,7 +25,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @RequestMapping("/user/service")
 @SessionAttributes("business")  // # business is a session attribute that must be available to perform user-business related opr.
-//@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('USER')")
 public class UserController {
     private final UserRepo userRepo;
     private final UserService userService;
@@ -78,9 +79,9 @@ public class UserController {
         return "redirect:/user/service/businessPage";
 
     }
+    //provides business Page
     @GetMapping("/businessPage")
     public String getBusinessPage(@SessionAttribute(value = "business",required = false) Business business, RedirectAttributes redirectAttributes) {
-        System.out.println("/businessPage:"+business);
         if(business == null) {
             redirectAttributes.addFlashAttribute("failure", "Select a Business First");
             return "redirect:/user/service/getBusiness";
@@ -88,6 +89,7 @@ public class UserController {
         return "userService/businessUserServingPage";
     }
 
+    //provide view page for accepting booking credentials
     @GetMapping("/getRoom")
     public String getRoom(@SessionAttribute(value = "business",required = false) Business business, RedirectAttributes redirectAttributes){
         if(business == null) {
@@ -97,9 +99,9 @@ public class UserController {
         return "userService/bookRoom";
     }
 
-// gets all available(active) rooms from selected business.
+//accepts user input for booking room, parses time and redirect to /bookRoom
     @PostMapping("/getRoom")
-    public String getRoom(@Valid @ModelAttribute BookRoomDto bookRoomDto,BindingResult bindingResult,@SessionAttribute(value = "business",required = false) Business business, Model model, RedirectAttributes redirectAttributes) {
+    public String getRoom(@Valid @ModelAttribute BookRoomDto bookRoomDto, BindingResult bindingResult, @SessionAttribute(value = "business",required = false) Business business, HttpSession httpSession, RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()){
             throw new CustomMethodArgFailedException("redirect:/user/service/getRoom",bindingResult);
         }
@@ -111,14 +113,7 @@ public class UserController {
         }
 try {
     BookingPolicy.BookingTime time = BookingPolicy.getTime(bookRoomDto);
-    //  2 find available(active) rooms for particular time duration from db using businessUuid stored in business(session attribute)
-    List<Room> availableRoomsFromDb = userService.findAvailableRooms(business.getBusinessUuid(),time);
-
-
-    Map<Room, BigDecimal> availableRoomsWithPrize = availableRoomsFromDb.stream().collect(Collectors.toMap(availableRoom -> availableRoom, availableRoom -> BookingPolicy.roomPrizeForDuration(time.getCheckInDate(), time.getCheckoutDate(), availableRoom.getPricePerHour()).orElseThrow(() -> new BookingCancellationException("Invalid Duration provided"))));
-    redirectAttributes.addFlashAttribute("availableRooms", availableRoomsWithPrize);
-    redirectAttributes.addFlashAttribute("checkInDate",time.getCheckInDate());
-    redirectAttributes.addFlashAttribute("checkoutDate",time.getCheckoutDate());
+    redirectAttributes.addFlashAttribute("time",time);
     return "redirect:/user/service/bookRoom";
 
 }
@@ -131,28 +126,27 @@ catch (Exception e) {
     return "redirect:/user/service/getRoom";
 }
     }
+    //if succeed provides list of available rooms(potentially for booking)
     @GetMapping("/bookRoom")
-    public String bookRoom(@ModelAttribute(value = "availableRooms",binding = false) Map<Room,BigDecimal> availableRooms,
-                           @ModelAttribute(value = "checkInDate",binding = false) LocalDateTime checkInDate,
-                           @ModelAttribute(value = "checkoutDate",binding = false) LocalDateTime checkoutDate,
-                           @SessionAttribute(value = "business",required = false)Business business,
-                           RedirectAttributes redirectAttributes,Model model){
+    public String bookRoom(@ModelAttribute(value = "time",binding = false)BookingPolicy.BookingTime time, @SessionAttribute(value = "business",required = false)Business business,
+                          Model model, RedirectAttributes redirectAttributes){
         if(business==null) {
             redirectAttributes.addFlashAttribute("failure", "Select Business to continue");
             return "redirect:/user/service/getBusiness";
         }
-        if(availableRooms==null||checkInDate==null||checkoutDate==null){
-            redirectAttributes.addFlashAttribute("failure","First fill these credentials");
+        if(time.getCheckInDate()==null||time.getCheckoutDate()==null){
+            redirectAttributes.addFlashAttribute("failure","First fill this form");
             return "redirect:/user/service/getRoom";
         }
-        model.addAttribute("availableRooms",availableRooms);
-        model.addAttribute("checkInDate",checkInDate);
-        model.addAttribute("checkoutDate",checkoutDate);
-        availableRooms.forEach((room, methodLocalDto) -> System.out.println("key(room):"+room+",value(methodlocal):"+methodLocalDto));
+        List<Room> availableRoomsFromDb = userService.findAvailableRooms(business.getBusinessUuid(),time);
+        Map<Room, BigDecimal> availableRoomsWithPrize = availableRoomsFromDb.stream().collect(Collectors.toMap(availableRoom -> availableRoom, availableRoom -> BookingPolicy.roomPrizeForDuration(time.getCheckInDate(), time.getCheckoutDate(), availableRoom.getPricePerHour()).orElseThrow(() -> new BookingCancellationException("Invalid Duration provided"))));
+        model.addAttribute("availableRooms", availableRoomsWithPrize);
+        model.addAttribute("checkInDate",time.getCheckInDate());
+        model.addAttribute("checkoutDate",time.getCheckoutDate());
         return "userService/availableRooms";
     }
 
-   // post request,if succeed user books room from a selected business
+   // if succeed user books room from a selected business
     @PostMapping("/bookRoom")
     public String bookRoom(@Valid @ModelAttribute("bookRoomDto") RoomBook roomBook, BindingResult bindingResult, @SessionAttribute(value = "business",required = false) Business business, Principal principal, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()){
@@ -170,25 +164,32 @@ catch (Exception e) {
             Optional<User> userByEmail = userRepo.findUserByEmail(username);
             User user = userByEmail.orElseThrow(() -> new StaleUserException("user does not exist in db"));
 
-            //book room dto post-> roomNumber(unique per business but not room),checkInTime,checkoutTime
+            //book room-> roomNumber(unique per business but not room),checkInTime,checkoutTime
             //business-> businessId(pk)
             //roomNumber+businessId-> uniquely identifies particular business room.
 
             // 2 books room based on above credentials
            userService.bookRoom(roomBook,user,business.getBusinessId());
+           BookingPolicy.BookingTime bookingTime=new BookingPolicy.BookingTime(roomBook.getCheckInTime(),roomBook.getCheckoutTime());
+           redirectAttributes.addFlashAttribute("time",bookingTime);
             redirectAttributes.addFlashAttribute("success", "Room booked successfully");
-            return "redirect:/user/service/getRoom";
+            return "redirect:/user/service/bookRoom";
         }
         catch (BookingCancellationException | RoomNotFoundException | InsufficientBalanceException e){
+            BookingPolicy.BookingTime bookingTime=new BookingPolicy.BookingTime(roomBook.getCheckInTime(),roomBook.getCheckoutTime());
+            redirectAttributes.addFlashAttribute("time",bookingTime);
             redirectAttributes.addFlashAttribute("failure", e.getMessage());
-            return "redirect:/user/service/getRoom";
+            return "redirect:/user/service/bookRoom";
         }
         catch(Exception e) {
+            BookingPolicy.BookingTime bookingTime=new BookingPolicy.BookingTime(roomBook.getCheckInTime(),roomBook.getCheckoutTime());
+            redirectAttributes.addFlashAttribute("time",bookingTime);
             redirectAttributes.addFlashAttribute("failure","something went wrong on server");
-            return "redirect:/user/service/getRoom";
+            return "redirect:/user/service/bookRoom";
         }
 
     }
+    //fetches particular user booking and send it to the user
     @GetMapping("/cancelBooking")
     public String cancelBooking(@SessionAttribute(value = "business",required = false) Business business,Model model,Principal principal,RedirectAttributes redirectAttributes) {
         if(business==null) {
@@ -205,8 +206,9 @@ catch (Exception e) {
         }
     }
 
+    //if succeeded, user cancels the particular room booking
     @PostMapping("/cancelBooking")
-    public String cancelBooking(@Valid @ModelAttribute CancelBookingDto roomBookingCancel , RedirectAttributes redirectAttributes, Principal principal, @ModelAttribute("business") Business business) {
+    public String cancelBooking(@Valid @ModelAttribute CancelBookingDto roomBookingCancel , RedirectAttributes redirectAttributes, Principal principal, @SessionAttribute(value = "business",required = false) Business business) {
         if(business==null) {
             redirectAttributes.addFlashAttribute("failure","Select Business to continue");
            return "redirect:/user/service/getBusiness";

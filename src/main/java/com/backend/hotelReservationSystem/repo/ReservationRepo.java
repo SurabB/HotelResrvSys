@@ -42,8 +42,8 @@ public interface ReservationRepo extends JpaRepository<ReservationTable,Long> {
     @Query("select b from Business b join b.user u where u.isActive=true")
     List<Business> findAvailableBusiness();
 
-@Query("select rt from ReservationTable rt join rt.user u  join fetch  rt.room r join r.business b where u.email=:userEmail and b.businessId=:businessId and rt.status=:booked")
-    List<ReservationTable> findBookingsOfParticularUser(String userEmail, Long businessId, ReservationStatus booked);
+@Query("select rt from ReservationTable rt join rt.user u  join fetch  rt.room r join r.business b where u.email=:userEmail and b.businessId=:businessId and (rt.status=:booked or rt.status=:checkedIn)")
+    List<ReservationTable> findBookingsOfParticularUser(String userEmail, Long businessId, ReservationStatus booked,ReservationStatus checkedIn);
 
 @Query("select rt from ReservationTable rt join fetch rt.room r join rt.user u join r.business b where b.businessId=:businessId and r.roomNumber=:roomNo and u.email=:userEmail and b.user.isActive=true and rt.status=:booked and rt.checkInDate=:checkInDate and rt.checkoutDate=:checkoutDate")
     Optional<ReservationTable> findBookedRoomOfParticularUser(Long roomNo,LocalDateTime checkInDate,LocalDateTime checkoutDate, String userEmail, Long businessId,ReservationStatus booked);

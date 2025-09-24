@@ -5,6 +5,7 @@ import com.backend.hotelReservationSystem.exceptionClasses.BookingCancellationEx
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,16 +59,22 @@ public class BookingPolicy {
             return Optional.empty();
         }
         Duration duration=Duration.between(startingTime,endingTime);
-        BigDecimal hours=BigDecimal.valueOf(duration.toHours());
-        BigDecimal minutes=BigDecimal.valueOf(duration.toMinutes());
-        BigDecimal totalPrize=hours.multiply(prizePerHour).add(minutes.divide(BigDecimal.valueOf(60l)).multiply(prizePerHour));
+        long hours = duration.toHours();
+        long minutes = duration.toMinutesPart();
+
+        BigDecimal totalPrize =
+                BigDecimal.valueOf(hours).multiply(prizePerHour)
+                        .add(BigDecimal.valueOf(minutes)
+                                .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP)
+                                .multiply(prizePerHour));
         return Optional.of(totalPrize);
 
     }
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor
     @Getter
+    @ToString
     public static class BookingTime{
-        private final LocalDateTime checkInDate;
-        private  final LocalDateTime checkoutDate;
+        private LocalDateTime checkInDate;
+        private LocalDateTime checkoutDate;
     }
 }

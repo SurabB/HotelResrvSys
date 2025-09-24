@@ -12,6 +12,7 @@
 /.vscode/
 out/
 
+
 # Java
 *.class
 *.jar
@@ -28,6 +29,8 @@ Thumbs.db
 # Ignore real application properties so secrets are not pushed
 /src/main/resources/application.properties
 
+
 # Other
-*.swp   # Vim swap files
+*.swp
 HELP.md
+/src/test

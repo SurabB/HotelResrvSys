@@ -43,7 +43,6 @@ public class BusinessRegController {
     }
     @GetMapping("/dashboard")
     public String dashboardPage(){
-        System.out.println(" business dashboard page");
         return "businessService/BusinessDashboard";
     }
 }

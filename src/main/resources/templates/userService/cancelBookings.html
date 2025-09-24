@@ -24,6 +24,7 @@
         <th>Booking Date</th>
         <th>Check In Date</th>
         <th>Checkout Date</th>
+        <th>Status</th>
         <th> Amount paid for Booking Room</th>
         <th>Penalty Amt(5% of paid amt) </th>
         <th> Expected amount you will get(if cancelled now)</th>
@@ -40,6 +41,7 @@
         <td th:text="${booking.key.bookingDate}"></td>
         <td th:text="${booking.key.checkInDate}"></td>
         <td th:text="${booking.key.checkoutDate}"></td>
+        <td th:text="${booking.key.status}"></td>
         <td th:text="${booking.key.paymentAmt}"></td>
         <td th:text="${booking.key.paymentAmt}-${booking.value}"></td>
         <td th:text="${booking.value}"> </td>
