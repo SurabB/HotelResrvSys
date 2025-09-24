@@ -3,18 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Booked Room Information</title>
+    <link rel="stylesheet" th:href="@{/css/table.css}">
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
-    <style>
-        table {
-
-            border-collapse: collapse;
-        }
-        th, td{
-            border:2px solid black;
-            padding: 24px;
-
-        }
-    </style>
 </head>
 <body>
 
@@ -31,9 +21,9 @@
         <th>Room Type</th>
         <th>Active Status</th>
         <th>Booking Date</th>
+        <th>CheckIng Date</th>
         <th>Checked Out Date</th>
         <th>Paid amount</th>
-        <th>Checked Out In</th>
     </tr>
     </thead>
 
@@ -45,6 +35,7 @@
         <td th:text="${element.key.roomType}"></td>
         <td th:text="${element.key.roomIsActive}"></td>
         <td th:text="${element.value.bookingDate}"></td>
+        <td th:text="${element.value.checkInDate}"></td>
         <td th:text="${element.value.checkoutDate}"></td>
         <td th:text="${element.value.paymentAmt}"></td>
 

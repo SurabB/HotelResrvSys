@@ -33,8 +33,6 @@ public class BusinessService {
    private final BusinessRepo businessRepo;
    private final RoomRepo roomRepo;
    private final UserRepo userRepo;
-   private final ReservationRepo reservationRepo;
-
    // if request succeeds, business get added to db
    public void addBusiness(BusinessRegAcceptor businessRegAcceptor,String username){
 
@@ -89,12 +87,12 @@ public class BusinessService {
     }
 
     public List<Room> getAllAvailableRooms(String userEmail) {
-     return reservationRepo.findAvailableRoomsByEmail(userEmail, ReservationStatus.BOOKED);
+     return roomRepo.findAvailableRoomsByEmail(userEmail, ReservationStatus.BOOKED);
     }
 
     public boolean changeRoomInfo(RoomUpdateDto roomUpdateDto, String businessEmail) {
 //   check if there is a room that has room number associated with business that user wants to change.
-        Optional<Room> particularRoomByBusinessEmail = reservationRepo.findParticularRoomByBusinessEmail(roomUpdateDto.getActiveRoomNumber(), businessEmail, ReservationStatus.BOOKED);
+        Optional<Room> particularRoomByBusinessEmail = roomRepo.findParticularRoomByBusinessEmail(roomUpdateDto.getActiveRoomNumber(), businessEmail, ReservationStatus.BOOKED);
 
         //if no room exist returns false->room has been removed or user passed inaccurate room number
       if(particularRoomByBusinessEmail.isEmpty()){
@@ -127,7 +125,7 @@ public class BusinessService {
     }
 
     public Map<Room,ReservationTable> findBookedRooms(String businessEmail) {
-        List<Room> bookedReservationAndRooms = reservationRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED);
+        List<Room> bookedReservationAndRooms = roomRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED);
          return bookedReservationAndRooms.stream().collect(Collectors.toMap(room -> room, room -> room.getReservation().getFirst()));
 
 

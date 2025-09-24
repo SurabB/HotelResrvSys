@@ -11,7 +11,10 @@ import com.backend.hotelReservationSystem.entity.User;
 import com.backend.hotelReservationSystem.exceptionClasses.BookingCancellationException;
 import com.backend.hotelReservationSystem.exceptionClasses.InsufficientBalanceException;
 import com.backend.hotelReservationSystem.exceptionClasses.RoomNotFoundException;
+import com.backend.hotelReservationSystem.repo.BusinessRepo;
 import com.backend.hotelReservationSystem.repo.ReservationRepo;
+import com.backend.hotelReservationSystem.repo.RoomRepo;
+import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.BookingCancellationPolicy;
 import com.backend.hotelReservationSystem.utils.BookingPolicy;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
@@ -30,10 +33,13 @@ import java.util.Optional;
 @AllArgsConstructor
 @Transactional
 public class UserService {
+    private final BusinessRepo businessRepo;
+    private final UserRepo userRepo;
+    private final RoomRepo roomRepo;
     private final ReservationRepo reservationRepo;
 
     public List<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime){
-        return reservationRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
+        return roomRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
 
     }
 
@@ -44,7 +50,7 @@ public class UserService {
           }
 
 //        // 1. find the room
-        Room room = reservationRepo.findRoomExistence(businessId, bookRoomDto.getRoomNumber(), bookRoomDto.getCheckInTime(),bookRoomDto.getCheckoutTime(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN)
+        Room room = roomRepo.findRoomExistence(businessId, bookRoomDto.getRoomNumber(), bookRoomDto.getCheckInTime(),bookRoomDto.getCheckoutTime(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found or already rented or not available for renting"));
 //
 //        2. calculate total price
@@ -57,13 +63,13 @@ public class UserService {
 //
 //
 //        // 4. deduct user balance
-        boolean userSuccess = reservationRepo.deductUserBalance(user.getUserId(), totalPrice) > 0;
+        boolean userSuccess = userRepo.deductUserBalance(user.getUserId(), totalPrice) > 0;
         if (!userSuccess) {
             throw new InsufficientBalanceException("Insufficient balance or user not found");
         }
 
 //        // 5. add business balance
-        boolean businessSuccess = reservationRepo.addBusinessBalance(businessId, totalPrice) > 0;
+        boolean businessSuccess = userRepo.addBusinessBalance(businessId, totalPrice) > 0;
         if (!businessSuccess) {
             throw new RuntimeException("Business not found or balance update failed");
         }
@@ -78,11 +84,11 @@ public class UserService {
 
     public Optional<Business> findBusiness(FindBusinessDto findbusinessdto) {
 
-        return reservationRepo.findBusiness(findbusinessdto.getBusinessName(),findbusinessdto.getCity(),findbusinessdto.getLocation());
+        return businessRepo.findBusiness(findbusinessdto.getBusinessName(),findbusinessdto.getCity(),findbusinessdto.getLocation());
     }
 
     public List<Business> findAllAvailableBusinesses() {
-        return reservationRepo.findAvailableBusiness();
+        return businessRepo.findAvailableBusiness();
     }
 
     public HashMap<ReservationTable,BigDecimal> findBookingsOfParticularUser(String name, Long businessId) {
@@ -111,8 +117,8 @@ public class UserService {
         Duration duration = Duration.between(reservationTable.getCheckInDate(), reservationTable.getCheckoutDate());
 
         BigDecimal priceToReturn = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
-        int userSuccess = reservationRepo.addUserBalance(priceToReturn, userEmail);
-        int businessSuccess = reservationRepo.deductBusinessBalance(businessId, priceToReturn);
+        int userSuccess = userRepo.addUserBalance(priceToReturn, userEmail);
+        int businessSuccess = userRepo.deductBusinessBalance(businessId, priceToReturn);
         if (userSuccess!=1){
             throw new RuntimeException("something went wrong");
         }
