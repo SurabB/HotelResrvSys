@@ -21,6 +21,7 @@ public class MyScheduledTask {
     private final ReservationHistoryRepo reservationHistoryRepo;
 
     @Transactional
+    @Scheduled(fixedDelay = 60000)
     @Scheduled(cron = "0 00 12 * * *")
     public void runDailyTask() {
         try {

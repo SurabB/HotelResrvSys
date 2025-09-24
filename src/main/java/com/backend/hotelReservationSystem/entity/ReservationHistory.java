@@ -20,9 +20,9 @@ public class ReservationHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long historyId;
 
-    @ManyToOne
-    @JoinColumn(name = "reservation_id", nullable = false)
-    private ReservationTable originalReservation;
+
+    @Column(name = "reservation_id", nullable = false)
+    private Long reservationId;
 
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
