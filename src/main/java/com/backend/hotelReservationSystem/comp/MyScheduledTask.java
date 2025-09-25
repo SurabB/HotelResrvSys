@@ -21,15 +21,16 @@ public class MyScheduledTask {
     private final ReservationHistoryRepo reservationHistoryRepo;
 
     @Transactional
-//    @Scheduled(fixedRate = 60000)
-    @Scheduled(cron = "0 00 01 * * *")
+    //@Scheduled(fixedDelay = 60000)
+    @Scheduled(cron = "0 00 12 * * *")
     public void runDailyTask() {
         try {
-            List<ReservationTable> allExceptBookedStatus = reservationRepo.findAllExceptBookedStatus(ReservationStatus.CHECKED_OUT, ReservationStatus.CANCELLED);
-            List<ReservationHistory> reservationHistory = allExceptBookedStatus.stream().map(reservationTable -> CustomBuilder.createReservationHistoryObj(reservationTable)).toList();
-            if(!reservationHistory.isEmpty()) {
-                log.info("Fetched {} reservations, saving {} history entries", allExceptBookedStatus.size(), reservationHistory.size());
+            List<ReservationTable> cancelledAndCheckedOutRooms = reservationRepo.findRoomsWithStatusCheckoutAndCancelled(ReservationStatus.CHECKED_OUT, ReservationStatus.CANCELLED);
+            List<ReservationHistory> reservationHistory = cancelledAndCheckedOutRooms.stream().map(reservationTable -> CustomBuilder.createReservationHistoryObj(reservationTable)).toList();
+            if(!cancelledAndCheckedOutRooms.isEmpty()) {
+                log.info("Fetched {} reservations, saving {} history entries", cancelledAndCheckedOutRooms.size(), reservationHistory.size());
                 reservationHistoryRepo.saveAll(reservationHistory);
+                reservationRepo.deleteAll(()->cancelledAndCheckedOutRooms.iterator());
             }
             else {
                 log.info("No reservations Today");

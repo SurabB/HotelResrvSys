@@ -2,6 +2,7 @@ package com.backend.hotelReservationSystem.utils;
 
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
+import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBook;
 import com.backend.hotelReservationSystem.entity.*;
 import com.backend.hotelReservationSystem.enums.MailStatus;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
@@ -58,26 +59,31 @@ public class CustomBuilder {
                 .roomType(roomAcceptorDto.getRoomType())
                 .build();
     }
-    public static ReservationTable createReservationObj(Integer bookingTime, User user, Room room, BigDecimal totalPrice){
+    public static ReservationTable createReservationObj(RoomBook bookRoomDtoPost, User user, Room room, BigDecimal totalPrice){
 return  ReservationTable.builder()
         .user(user)
         .room(room)
         .paymentAmt(totalPrice)
+        .pricePerHr(room.getPricePerHour())
         .bookingDate(LocalDateTime.now())
-        .checkoutDate(LocalDateTime.now().plusHours(bookingTime))
+        .checkInDate(bookRoomDtoPost.getCheckInTime())
+        .checkoutDate(bookRoomDtoPost.getCheckoutTime())
         .status(ReservationStatus.BOOKED)
         .build();
     }
     public static ReservationHistory createReservationHistoryObj(ReservationTable reservationTable){
        return  ReservationHistory.builder()
+               .checkInDate(reservationTable.getCheckInDate())
                 .createdAt(LocalDateTime.now())
                 .user(reservationTable.getUser())
                 .room(reservationTable.getRoom())
                 .business(reservationTable.getRoom().getBusiness())
-                .originalReservation(reservationTable)
+                .reservationId(reservationTable.getReservationId())
+               .pricePerHour(reservationTable.getPricePerHr())
                 .paymentAmount(reservationTable.getPaymentAmt())
                 .status(reservationTable.getStatus())
                 .bookingDate(reservationTable.getBookingDate())
+               .checkInDate(reservationTable.getCheckInDate())
                 .checkoutDate(reservationTable.getCheckoutDate())
         .build();
     }

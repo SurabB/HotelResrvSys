@@ -31,7 +31,7 @@ import java.util.Map;
 public class BusinessController {
     private final BusinessService businessService;
     @GetMapping("/businessReg")
-    @PreAuthorize("hasRole('BUSINESS')")
+    @PreAuthorize("hasRole('BUSINESS')&& (!@customAuth.isBusinessReg())")
     public String businessReg() {
         return "businessService/businessReg";
 
@@ -47,7 +47,7 @@ public class BusinessController {
         try {
                 businessService.addBusiness(businessRegAcceptor,principal.getName());
                 redirectAttributes.addFlashAttribute("success", "Business added successfully!");
-                return "redirect:/business/service/businessReg";
+                return "redirect:/business/resource/dashboard";
         }
         catch (DataIntegrityViolationException ex) {
             redirectAttributes.addFlashAttribute("failure", "Business already exists!");
@@ -92,7 +92,6 @@ public class BusinessController {
 
     @GetMapping("/changeRoomStatus")
     public String changeRoomStatus(Principal principal, Model model){
-        System.out.println("change room status");
         List<Room> allRooms = businessService.getAllRooms(principal.getName());
         model.addAttribute("allRooms",allRooms);
         return "businessService/changeRoomStatus";
@@ -123,12 +122,9 @@ public class BusinessController {
     @PostMapping("/changeRoomInfo")
     public  String changeRoomInfo(@Valid @ModelAttribute RoomUpdateDto roomUpdateDto, BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes){
         if (bindingResult.hasErrors()){
-            System.out.println("inside binding error");
             throw new CustomMethodArgFailedException("redirect:/business/service/changeRoomInfo",bindingResult);
         }
         try {
-
-            System.out.println("change room info"+roomUpdateDto.getRoomNumber());
             boolean changed = businessService.changeRoomInfo(roomUpdateDto, principal.getName());
             if (changed) {
                 redirectAttributes.addFlashAttribute("success", "Room info changed successfully!");

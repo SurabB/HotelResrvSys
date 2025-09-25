@@ -17,6 +17,7 @@ uniqueConstraints = @UniqueConstraint(
         name="UK_businessId_roomNumber",
         columnNames = {"business_id", "room_number"}
 ))
+@ToString(exclude = {"business","reservation"})
 public class Room {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

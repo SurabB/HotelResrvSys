@@ -20,9 +20,9 @@ public class ReservationHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long historyId;
 
-    @ManyToOne
-    @JoinColumn(name = "reservation_id", nullable = false)
-    private ReservationTable originalReservation;
+
+    @Column(name = "reservation_id", nullable = false)
+    private Long reservationId;
 
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
@@ -40,8 +40,9 @@ public class ReservationHistory {
     private ReservationStatus status;
 
     private LocalDateTime bookingDate;
+    private LocalDateTime checkInDate;
     private LocalDateTime checkoutDate;
-
+   private BigDecimal pricePerHour;
     private BigDecimal paymentAmount;
 
     private LocalDateTime createdAt;

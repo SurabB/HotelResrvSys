@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title th:text="${business.businessName}"> Business Page</title>
@@ -15,7 +15,7 @@
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
 <br>
-<a th:href="@{/user/service/bookRoom}" target="_blank" rel="noopener noreferrer">
+<a th:href="@{/user/service/getRoom}" target="_blank" rel="noopener noreferrer">
     Book Room
 </a>
 <br>

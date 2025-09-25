@@ -22,9 +22,11 @@
         <th>Location</th>
         <th>Room No</th>
         <th>Booking Date</th>
-        <th>Expected Checkout Date</th>
+        <th>Check In Date</th>
+        <th>Checkout Date</th>
+        <th>Status</th>
         <th> Amount paid for Booking Room</th>
-        <th>Remaining Duration amount-Penalty(10% Of Remaining Duration amount) </th>
+        <th>Penalty Amt(5% of paid amt) </th>
         <th> Expected amount you will get(if cancelled now)</th>
         <th>Cancel Booking</th>
     </tr>
@@ -37,13 +39,19 @@
         <td th:text="${business.location}"></td>
         <td th:text="${booking.key.room.roomNumber}"></td>
         <td th:text="${booking.key.bookingDate}"></td>
+        <td th:text="${booking.key.checkInDate}"></td>
         <td th:text="${booking.key.checkoutDate}"></td>
+        <td th:text="${booking.key.status}"></td>
         <td th:text="${booking.key.paymentAmt}"></td>
         <td th:text="${booking.key.paymentAmt}-${booking.value}"></td>
         <td th:text="${booking.value}"> </td>
         <td>
             <form th:action="@{/user/service/cancelBooking}" method="post">
                 <input type="hidden" name="roomNumber" th:value="${booking.key.room.roomNumber}">
+                <input type="hidden" name="checkInTime" th:value="${booking.key.checkInDate}">
+                <input type="hidden" name="checkoutTime" th:value="${booking.key.checkoutDate}">
+
+
                 <button type="submit" th:onclick="|return confirm('Do you really want to cancel booking for Room number'+${booking.key.room.roomNumber}+'?);'+|">Submit</button>
             </form>
         </td>

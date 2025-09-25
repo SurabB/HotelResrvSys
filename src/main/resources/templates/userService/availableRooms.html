@@ -6,70 +6,37 @@
     <link rel="stylesheet" th:href="@{/css/table.css}" href="../../../css/table.css"/>
 
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll("tr").forEach(row => {
-                let hoursInput = row.querySelector(".hours");
-                let priceCell = row.querySelector(".price");
-                let totalSpan = row.querySelector(".totalPrice");
-                let hiddenHours = row.querySelector(".hiddenHours");
-
-                function updateTotal() {
-                    let hours = parseInt(hoursInput.value) || 1;
-                    let pricePerHour = parseFloat(priceCell.textContent);
-                    let total = hours * pricePerHour;
-
-                    totalSpan.textContent = total.toFixed(2);
-                    hiddenHours.value = hours;  // only pass hours to backend
-                }
-
-                if (hoursInput && priceCell && totalSpan) {
-                    updateTotal(); // initial load
-                    hoursInput.addEventListener("input", updateTotal);
-                }
-            });
-        });
-    </script>
-
 </head>
 <body>
 
 <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
-
+<p th:if="${availableRooms.size() > 0}" th:text="|CheckInTime time-Checkout Time:${checkInDate}-${checkoutDate}|"></p>
 <table th:if="${availableRooms.size() > 0}">
         <tr>
             <th>SNo</th>
             <th>RoomNo</th>
             <th>Room Type</th>
             <th>Price per Hour</th>
-            <th>Enter number of hours</th>
             <th>Total Price</th>
             <th>Book Room</th>
         </tr>
 
         <tr th:each="room, iterStat : ${availableRooms}">
             <td th:text="${iterStat.count}"></td>
-            <td th:text="${room.roomNumber}"></td>
-            <td th:text="${room.roomType}"></td>
-            <td th:text="${room.pricePerHour}" class="price"></td>
-
-            <!-- Input hours -->
-            <td>
-                <input type="number" class="hours" min="1" value="1">
-            </td>
-
-            <!-- Total price auto updates -->
-            <td>
-                <span class="totalPrice"></span>
-            </td>
+            <td th:text="${room.key.roomNumber}"></td>
+            <td th:text="${room.key.roomType}"></td>
+            <td th:text="${room.key.pricePerHour}"></td>
+            <td th:text="${room.value}"></td>
 
             <!-- Book Room Form -->
             <td>
                 <form th:action="@{/user/service/bookRoom}" method="post">
-                    <input type="hidden" name="roomNumber" th:value="${room.roomNumber}">
-                    <input type="hidden" name="bookingTime" class="hiddenHours" value="1">
+                    <input type="hidden" name="roomNumber" th:value="${room.key.roomNumber}">
+                    <input type="hidden" name="checkInTime" th:value="${checkInDate}">
+                    <input type="hidden" name="checkoutTime" th:value="${checkoutDate}">
+
                     <button type="submit" onclick="return confirm('Do you really want to Book room');">Book</button>
                 </form>
 
