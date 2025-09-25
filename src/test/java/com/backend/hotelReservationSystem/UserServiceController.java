@@ -19,7 +19,7 @@ public class UserServiceController {
     public void bookRoom() throws Exception {
         mockMvc.perform(post("/user/service/bookRoom")
                         .param("roomNumber", "1")
-                        .param("checkInTime", "2025-09-22T17:20:00")
+                        .param("checkInDate", "2025-09-22T17:20:00")
                         .param("checkoutTime","2025-09-22T19:20:00"))
                 .andExpect(status().isOk())
                 .andDo(print());

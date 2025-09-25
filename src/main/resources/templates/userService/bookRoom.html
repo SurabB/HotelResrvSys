@@ -12,17 +12,22 @@
 
     <div id="container" class="flex ">
         <h1>Book Room</h1>
-        <div id="bookingTime_div" class="flex form_container">
-            <label for="bookingTime">Booking Date </label>
-            <input class="form_container_child" type="date" id="bookingTime" name="bookingTime" placeholder="Day to Book" required/>
+        <div id="checkInDate_div" class="flex form_container">
+            <label for="checkInDate">CheckIn Date </label>
+            <input class="form_container_child" type="date" id="checkInDate" name="checkInDate" placeholder="Check In date" required/>
         </div>
-        <div id="checkIn_div" class="flex form_container">
-            <label for="startingTime">CheckIn Time </label>
-            <input class="form_container_child" type="text" id="startingTime" name="startingTime" placeholder="Enter checkIn Time" required />
+        <div id="checkInTime_div" class="flex form_container">
+            <label for="checkInTime">CheckIn Time </label>
+            <input class="form_container_child" type="text" id="checkInTime" name="checkInTime" placeholder="Enter checkIn Time" required />
         </div>
-        <div id="checkout_div" class="flex form_container">
-            <label for="endingTime">Checkout Time </label>
-            <input class="form_container_child" type="text" id="endingTime" name="endingTime" placeholder="Enter checkout Time" required />
+        <div id="checkoutDate_div" class="flex form_container">
+            <label for="checkoutDate">Checkout Date </label>
+            <input class="form_container_child" type="date" id="checkoutDate" name="checkoutDate" placeholder="Checkout date" required/>
+        </div>
+
+        <div id="checkoutTime_div" class="flex form_container">
+            <label for="checkoutTime">Checkout Time </label>
+            <input class="form_container_child" type="text" id="checkoutTime" name="checkoutTime" placeholder="Enter checkout Time" required />
         </div>
         <div id="submit_div">
             <button type="submit">Submit</button>

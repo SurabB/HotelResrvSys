@@ -15,12 +15,10 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingPolicy {
     public static BookingTime getTime(BookRoomDto bookRoomDto){
-        LocalDate bookingTime = bookRoomDto.getBookingTime();
-
-        LocalDateTime checkInTime = parseTime(bookRoomDto.getStartingTime(), bookRoomDto.getBookingTime());
-        LocalDateTime checkoutTime=parseTime(bookRoomDto.getEndingTime(),bookRoomDto.getBookingTime());
-        if(checkInTime.isBefore(LocalDateTime.now())||checkInTime.isAfter(checkoutTime)||checkoutTime.isAfter(bookRoomDto.getBookingTime().atStartOfDay().plusHours(24))){
-            throw new BookingCancellationException("Invalid time limit provided. Time limit must be valid for a particular day.");
+        LocalDateTime checkInTime = parseTime(bookRoomDto.getCheckInTime(), bookRoomDto.getCheckInDate());
+        LocalDateTime checkoutTime=parseTime(bookRoomDto.getCheckoutTime(),bookRoomDto.getCheckoutDate());
+        if(checkInTime.isBefore(LocalDateTime.now())||checkInTime.isAfter(checkoutTime)){
+            throw new BookingCancellationException("Invalid time limit provided. Time limit must be valid for a particular period");
         }
         Duration duration = Duration.between(checkInTime, checkoutTime);
         if(duration.toHours()<1){

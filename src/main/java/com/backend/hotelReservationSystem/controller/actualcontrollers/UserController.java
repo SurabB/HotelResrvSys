@@ -164,7 +164,7 @@ catch (Exception e) {
             Optional<User> userByEmail = userRepo.findUserByEmail(username);
             User user = userByEmail.orElseThrow(() -> new StaleUserException("user does not exist in db"));
 
-            //book room-> roomNumber(unique per business but not room),checkInTime,checkoutTime
+            //book room-> roomNumber(unique per business but not room),checkInDate,checkoutTime
             //business-> businessId(pk)
             //roomNumber+businessId-> uniquely identifies particular business room.
 
