@@ -1,5 +1,6 @@
 package com.backend.hotelReservationSystem.service.actualservice;
 
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
@@ -16,10 +17,14 @@ import com.backend.hotelReservationSystem.utils.CustomBuilder;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,8 +70,9 @@ public class BusinessService {
 
        }
 
-    public List<Room> findRoomByBusinessEmail(String userEmail) {
-     return roomRepo.findRoomByBusinessEmail(userEmail, ReservationStatus.BOOKED);
+    public Page<Room> findRoomByBusinessEmail(String userEmail, Integer pageNo) {
+         Pageable pageRequest = PageRequest.of(pageNo-1, PaginationReceiver.PAGE_SIZE);
+        return roomRepo.findRoomByBusinessEmail(userEmail, ReservationStatus.BOOKED,pageRequest);
     }
 
     public boolean changeRoomInfo(RoomUpdateDto roomUpdateDto, String businessEmail) {
@@ -103,9 +109,11 @@ public class BusinessService {
       return true;
     }
 
-    public Map<Room,ReservationTable> findBookedRooms(String businessEmail) {
-        List<Room> bookedReservationAndRooms = roomRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
-         return bookedReservationAndRooms.stream().collect(Collectors.toMap(room -> room, room -> room.getReservation().getFirst()));
+    public Page<ReservationTable> findBookedRooms(String businessEmail, Integer pageNo) {
+        Pageable  pageRequest = PageRequest.of(pageNo - 1, PaginationReceiver.PAGE_SIZE);
+        return roomRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
+
+
 
 
     }

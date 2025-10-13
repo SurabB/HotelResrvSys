@@ -1,5 +1,6 @@
 package com.backend.hotelReservationSystem.controller.actualcontrollers;
 
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomUpdateDto;
@@ -10,6 +11,7 @@ import com.backend.hotelReservationSystem.service.actualservice.BusinessService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +23,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -90,9 +94,11 @@ public class BusinessController {
     }
 
     @GetMapping("/changeRoomInfo")
-    public String changeRoomInfo(Principal principal, Model model){
-        List<Room> allRooms = businessService.findRoomByBusinessEmail(principal.getName());
-        model.addAttribute("allRooms",allRooms);
+    public String changeRoomInfo(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo, Principal principal, Model model){
+        Page<Room> allRooms = businessService.findRoomByBusinessEmail(principal.getName(),pageNo);
+        PaginationReceiver paginationReceiver = new PaginationReceiver(allRooms.getTotalPages(), pageNo);
+        model.addAttribute("paginationReceiver",paginationReceiver);
+        model.addAttribute("allRooms",allRooms.toList());
         return "businessService/changeRoomInfo";
     }
     @PostMapping("/changeRoomInfo")
@@ -116,8 +122,11 @@ public class BusinessController {
 
     }
     @GetMapping("/findBookedRooms")
-    public String findBookedRooms(Principal principal, Model model){
-        Map<Room, ReservationTable> bookedRooms = businessService.findBookedRooms(principal.getName());
+    public String findBookedRooms(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo, Principal principal, Model model){
+        Page<ReservationTable> bookedRoomsPage = businessService.findBookedRooms(principal.getName(),pageNo);
+        Map<ReservationTable,Room >bookedRooms = bookedRoomsPage.stream().collect(Collectors.toMap(Function.identity(), reservationTable -> reservationTable.getRoom()));
+        PaginationReceiver paginationReceiver = new PaginationReceiver(bookedRoomsPage.getTotalPages(), pageNo);
+        model.addAttribute("paginationReceiver",paginationReceiver);
         model.addAttribute("bookedRooms",bookedRooms);
         return  "businessService/bookedRooms";
     }

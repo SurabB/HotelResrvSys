@@ -30,27 +30,36 @@
     </thead>
 
     <tbody>
-    <tr th:each="element, roomStat : ${bookedRooms}">
-      <td th:text="${roomStat.count}"></td>
-        <td th:text="${element.key.roomNumber}"></td>
-        <td th:text="${element.key.pricePerHour}"></td>
-        <td th:text="${element.value.pricePerHr}"></td>
-        <td th:text="${element.value.roomType}"></td>
-        <td th:text="${element.value.status}"></td>
-        <td th:text="${element.key.roomIsActive}"></td>
-        <td th:text="${element.value.bookingDate}"></td>
-        <td th:text="${element.value.checkInDate}"></td>
-        <td th:text="${element.value.checkoutDate}"></td>
-        <td th:text="${element.value.paymentAmt}"></td>
+    <th:block th:each="element,counter : ${bookedRooms}">
+
+    <tr >
+      <td th:text="${counter.count}"></td>
+        <td th:text="${element.value.roomNumber}"></td>
+        <td th:text="${element.value.pricePerHour}"></td>
+        <td th:text="${element.key.pricePerHr}"></td>
+        <td th:text="${element.key.roomType}"></td>
+        <td th:text="${element.key.status}"></td>
+        <td th:text="${element.value.roomIsActive? 'ACTIVE':'INACTIVE'}"></td>
+        <td th:text="${element.key.bookingDate}"></td>
+        <td th:text="${element.key.checkInDate}"></td>
+        <td th:text="${element.key.checkoutDate}"></td>
+        <td th:text="${element.key.paymentAmt}"></td>
 
 
 
     </tr>
-
+    </th:block>
 
     </tbody>
 
 </table>
+<th:block th:if="${bookedRooms.size()>0}">
+
+    <th:block
+            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/business/service/findBookedRooms},${paginationReceiver})}">
+
+    </th:block>
+</th:block>
 <br>
 <a th:href="@{/business/resource/dashboard}">Back</a>
 <br>

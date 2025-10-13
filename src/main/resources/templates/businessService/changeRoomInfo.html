@@ -58,7 +58,13 @@
 
     </tbody>
 </table>
+<th:block th:if="${allRooms.size()>0}">
 
+    <th:block
+            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/business/service/changeRoomInfo},${paginationReceiver})}">
+
+    </th:block>
+</th:block>
 <br>
 <a th:href="@{/business/resource/dashboard}">Back</a>
 <br>

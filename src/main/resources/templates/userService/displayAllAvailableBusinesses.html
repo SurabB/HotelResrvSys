@@ -5,6 +5,12 @@
     <title>Select Hotels</title>
     <link rel="stylesheet" th:href="@{/css/table.css}">
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+     <style>
+         .active-Page{
+             background-color:blue;
+             color:white
+         }
+     </style>
 </head>
 <body>
 
@@ -39,6 +45,13 @@
     </tr>
     </tbody>
 </table>
+<th:block th:if="${allAvailableBusinesses.size()>0}">
+
+    <th:block
+            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/user/service/getBusiness},${paginationReceiver})}">
+
+    </th:block>
+</th:block>
 <br>
 <a th:href="@{/user/resource/dashboard}">Back</a>
 <br>

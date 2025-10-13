@@ -1,5 +1,6 @@
 package com.backend.hotelReservationSystem.service.regServ;
 
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.enums.Role;
 import com.backend.hotelReservationSystem.dto.commonDto.VerificationTokenAcceptor;
 import com.backend.hotelReservationSystem.entity.MailToken;
@@ -9,6 +10,9 @@ import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.TokenCreation;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,11 +59,13 @@ public class TokenService {
        return userRepo.save(actualUser);
 
     }
-public  List<User> getAllUnapprovedUsers(){
-    return userRepo.findUnapprovedUsers();
+public Page<User> getAllUnapprovedUsers(Integer pageNo){
+    Pageable pageRequest = PageRequest.of(pageNo - 1, PaginationReceiver.PAGE_SIZE);
+    return userRepo.findUnapprovedUsers(pageRequest);
 }
-public  List<User> getAllApprovedUsers(){
-        return userRepo.findApprovedUsers(Role.ADMIN);
+public  Page<User> getAllApprovedUsers(Integer pageNo){
+    Pageable pageRequest = PageRequest.of(pageNo - 1, PaginationReceiver.PAGE_SIZE);
+    return userRepo.findApprovedUsers(Role.ADMIN,pageRequest);
 }
 
     public boolean adminApproval(String email) {

@@ -69,6 +69,13 @@
     </tr>
     </tbody>
 </table>
+<th:block th:if="${bookingsAndRefundableAmt.size()>0}">
+
+    <th:block
+            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/user/service/cancelBooking},${paginationReceiver})}">
+
+    </th:block>
+</th:block>
 <br>
 <a th:href="@{/user/service/businessPage}">Back</a>
 <br>

@@ -3,6 +3,8 @@ package com.backend.hotelReservationSystem.repo;
 import com.backend.hotelReservationSystem.enums.Role;
 import com.backend.hotelReservationSystem.entity.User;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -35,23 +37,23 @@ public interface UserRepo extends JpaRepository<User,Long> {
     int addBusinessBalance(Long businessId, BigDecimal totalPrice);
 
     @Modifying(clearAutomatically = true)
-    @Query("Update User u set u.isAdminApproved =true where u.email = ?1 and u.isEmailVerified=true")
+    @Query("Update User u set u.isAdminApproved =true where u.email = :email and u.isEmailVerified=true")
     int approveUserByEmail(String email);
 
 
     @Modifying(clearAutomatically = true)
-    @Query("Update User u set u.isAdminApproved =false where u.email = ?1 and u.isEmailVerified=true and u.role!=?2")
-    int removeAdminApproval(String email,Role role);
+    @Query("Update User u set u.isAdminApproved =false where u.email = :email and u.isEmailVerified=true and u.role <> :admin")
+    int removeAdminApproval(String email,Role admin);
 
 
-    @Query("select u from User u where u.email=?1")
+    @Query("select u from User u where u.email= :email")
     Optional<User> findUserByEmail(String email);
 
 
    @Query("select u from User u where u.isAdminApproved=false and u.isEmailVerified=true ")
-   List<User> findUnapprovedUsers();
+   Page<User> findUnapprovedUsers(Pageable pageable);
 
 
-  @Query("select u from User u where u.isAdminApproved=true and u.role!=?1 and u.isEmailVerified=true")
-    List<User> findApprovedUsers(Role role);
+  @Query("select u from User u where u.isAdminApproved=true and u.role <> :admin and u.isEmailVerified=true")
+    Page<User> findApprovedUsers(Role admin,Pageable pageable);
 }

@@ -10,12 +10,12 @@ import java.util.ArrayDeque;
 @AllArgsConstructor
 @Getter
 public class PaginationReceiver {
-    private final Page<Room> rooms;
+    private final Integer totalPages;
     private  final Integer pageNo;
     private static final int PAGE_DISPLAY=3;
+    public static final int PAGE_SIZE=1;
 
     public ArrayDeque<Integer> indexes(){
-        int totalPages = rooms.getTotalPages();
         int count=pageNo;
         ArrayDeque<Integer> indexes= new ArrayDeque<>();
         boolean entered=false;
@@ -43,8 +43,9 @@ public class PaginationReceiver {
         return currentIndex==1;
     }
     public boolean isLast(int currentIndex){
-        return currentIndex==rooms.getTotalPages();
+        return currentIndex==totalPages;
     }
+
 
 
 }

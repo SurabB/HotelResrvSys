@@ -11,35 +11,28 @@
   </style>
 </head>
 <body>
-<div th:fragment="paginationDisplay(pageObj, pageNo)">
+<div th:fragment="paginationDisplay(url, paginationReceiver)">
 
-  <!-- Previous -->
-  <span th:if="${!pageObj.isFirst(pageNo)}">
-    <a th:classappend="active-Page" th:href="@{/user/service/bookRoom(pageNo=${pageNo - 1})}">
+   <span th:if="${!paginationReceiver.isFirst(paginationReceiver.pageNo)}">
+    <a th:href="@{${url}(pageNo=${paginationReceiver.pageNo-1})}">
       Previous
     </a>
   </span>
 
   <!-- Page Numbers -->
-  <span th:each="index : ${pageObj.indexes()}">
-  <a th:href="@{/user/service/bookRoom(
-      pageNo=${index},
-      checkInDate=${time.checkInDate},
-      checkoutDate=${time.checkoutDate}
-)}"
-     th:text="${index}"
-     th:classappend="${index == pageNo} ? 'active-page' : ''">
+  <span th:each="index : ${paginationReceiver.indexes()}">
+<a th:href="@{${url}(pageNo=${index})}"
+   th:text="${index}"
+   th:classappend="${index == paginationReceiver.pageNo} ? 'active-Page' : ''">
 </a>
   </span>
 
   <!-- Next -->
-  <span th:if="${!pageObj.isLast(pageNo)}">
-    <a th:classappend="active-Page"
-       th:href="@{/user/service/bookRoom(pageNo=${pageNo + 1})}">
+  <span th:if="${!paginationReceiver.isLast(paginationReceiver.pageNo)}">
+    <a th:href="@{${url}(pageNo=${paginationReceiver.pageNo+1})}">
       Next
     </a>
   </span>
-
 </div>
 
 

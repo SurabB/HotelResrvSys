@@ -13,6 +13,7 @@ import com.backend.hotelReservationSystem.exceptionClasses.*;
 import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.service.actualservice.UserService;
 import com.backend.hotelReservationSystem.utils.BookingPolicy;
+import com.backend.hotelReservationSystem.utils.SomeHelpers;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -41,15 +42,17 @@ public class UserController {
 
 //  get all available(active) businesses for selection
     @GetMapping("/getBusiness")
-    public String getBusiness(@SessionAttribute(value = "business",required = false)Business business, Model model, RedirectAttributes redirectAttributes) {
+    public String getBusiness(@RequestParam(value = "pageNo",defaultValue = "1")Integer pageNo,@SessionAttribute(value = "business",required = false)Business business, Model model, RedirectAttributes redirectAttributes) {
         if(business!=null){
             redirectAttributes.addFlashAttribute("failure","You need to first logout from Business");
             return "redirect:/user/service/businessPage";
         }
         try {
             //gets all businesses which are active from db.
-            List<Business> allAvailableBusinesses = userService.findAllAvailableBusinesses();
-            model.addAttribute("allAvailableBusinesses", allAvailableBusinesses);
+            Page<Business> allAvailableBusinesses = userService.findAllAvailableBusinesses(pageNo);
+            PaginationReceiver paginationReceiver = new PaginationReceiver(allAvailableBusinesses.getTotalPages(), pageNo);
+            model.addAttribute("paginationReceiver",paginationReceiver);
+            model.addAttribute("allAvailableBusinesses", allAvailableBusinesses.toList());
             return "userService/displayAllAvailableBusinesses";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("failure","something went wrong on server side");
@@ -140,10 +143,10 @@ catch (Exception e) {
             redirectAttributes.addFlashAttribute("failure","First fill this form");
             return "redirect:/user/service/getRoom";
         }
-        Page<Room> availableRoomsFromDb = userService.findAvailableRooms(business.getBusinessUuid(),time,pageNo-1);
+        Page<Room> availableRoomsFromDb = userService.findAvailableRooms(business.getBusinessUuid(),time,pageNo);
 
         Map<Room, BigDecimal> availableRoomsWithPrize = availableRoomsFromDb.stream().collect(Collectors.toMap(availableRoom -> availableRoom, availableRoom -> BookingPolicy.roomPrizeForDuration(time.getCheckInDate(), time.getCheckoutDate(), availableRoom.getPricePerHour()).orElseThrow(() -> new BookingCancellationException("Invalid Duration provided"))));
-        PaginationReceiver paginationReceiver = new PaginationReceiver(availableRoomsFromDb, pageNo);
+        PaginationReceiver paginationReceiver = new PaginationReceiver(availableRoomsFromDb.getTotalPages(), pageNo);
         model.addAttribute("availableRooms", availableRoomsWithPrize);
         model.addAttribute("checkInDate",time.getCheckInDate());
         model.addAttribute("checkoutDate",time.getCheckoutDate());
@@ -196,14 +199,17 @@ catch (Exception e) {
     }
     //fetches particular user booking and send it to the user
     @GetMapping("/cancelBooking")
-    public String cancelBooking(@SessionAttribute(value = "business",required = false) Business business,Model model,Principal principal,RedirectAttributes redirectAttributes) {
+    public String cancelBooking(@RequestParam(value = "pageNo",defaultValue = "1")Integer pageNo,@SessionAttribute(value = "business",required = false) Business business,Model model,Principal principal,RedirectAttributes redirectAttributes) {
         if(business==null) {
             redirectAttributes.addFlashAttribute("failure", "Select Business to continue");
             return "redirect:/user/service/getBusiness";
         }
         try {
-            HashMap<ReservationTable, BigDecimal> bookingsAndRefundableAmt = userService.findBookingsOfParticularUser(principal.getName(), business.getBusinessId());
+            Page<ReservationTable> bookingsAndRefundableAmtpage = userService.findBookingsOfParticularUser(principal.getName(), business.getBusinessId(),pageNo);
+            Map<ReservationTable, BigDecimal> bookingsAndRefundableAmt = SomeHelpers.convertToMap(bookingsAndRefundableAmtpage.toList());
+            PaginationReceiver paginationReceiver = new PaginationReceiver(bookingsAndRefundableAmtpage.getTotalPages(), pageNo);
             model.addAttribute("bookingsAndRefundableAmt", bookingsAndRefundableAmt);
+            model.addAttribute("paginationReceiver",paginationReceiver);
             return "userService/cancelBookings";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("failure", "something went wrong on server");

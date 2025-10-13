@@ -1,5 +1,6 @@
 package com.backend.hotelReservationSystem.controller.regLoginController;
 
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.adminDto.UserReceiverDto;
 import com.backend.hotelReservationSystem.dto.commonDto.EmailDto;
 import com.backend.hotelReservationSystem.enums.Role;
@@ -11,6 +12,7 @@ import com.backend.hotelReservationSystem.service.regServ.RegistrationService;
 import com.backend.hotelReservationSystem.service.regServ.TokenService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,10 +53,12 @@ public class AdminController {
 
     }
     @GetMapping("/adminApprove")
-    public String adminApprove(Model model) {
+    public String adminApprove(@RequestParam(name = "pageNo",defaultValue = "1") Integer pageNo,Model model) {
         //fetches all unapproved (adminApproval->false) users from db  for possible admin approval
-        List<User> unApprovedUsersFromDb = tokenService.getAllUnapprovedUsers();
-        List<UserReceiverDto> allUnapprovedUsers = unApprovedUsersFromDb.stream().map(user -> new UserReceiverDto(user.getEmail(), user.getRole().toString())).toList();
+        Page<User> unApprovedUsersPageFromDb = tokenService.getAllUnapprovedUsers(pageNo);
+        List<UserReceiverDto> allUnapprovedUsers = unApprovedUsersPageFromDb.stream().map(user -> new UserReceiverDto(user.getEmail(), user.getRole().toString())).toList();
+        PaginationReceiver paginationReceiver = new PaginationReceiver(unApprovedUsersPageFromDb.getTotalPages(), pageNo);
+        model.addAttribute("paginationReceiver",paginationReceiver);
         model.addAttribute("allUnapprovedUsers", allUnapprovedUsers);
         return "adminService/approveUsersGet";
     }
@@ -78,13 +82,13 @@ public class AdminController {
 
     }
     @GetMapping("/adminDisprove")
-    public String adminDisprove(Model model, RedirectAttributes redirectAttributes) {
+    public String adminDisprove(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo, Model model, RedirectAttributes redirectAttributes) {
 try {
     // fetches all approved(adminApproved->true) users from db for possible blocking of user
-    List<User> approvedUsersFromDb = tokenService.getAllApprovedUsers();
-    List<UserReceiverDto> approvedUsers = approvedUsersFromDb.stream().map(user -> new UserReceiverDto(user.getEmail(), user.getRole().toString())).toList();
-    model.addAttribute("approvedUsers", approvedUsers);
-
+    Page<User> approvedUsersPageFromDb = tokenService.getAllApprovedUsers(pageNo);
+    PaginationReceiver paginationReceiver = new PaginationReceiver(approvedUsersPageFromDb.getTotalPages(), pageNo);
+    model.addAttribute("approvedUsers", approvedUsersPageFromDb.toList());
+    model.addAttribute("paginationReceiver",paginationReceiver);
     return "adminService/disapproveUserGet";
 }
 catch(Exception e){

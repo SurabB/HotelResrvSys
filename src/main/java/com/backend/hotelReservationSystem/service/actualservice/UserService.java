@@ -1,5 +1,6 @@
 package com.backend.hotelReservationSystem.service.actualservice;
 
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.userServiceDto.CancelBookingDto;
 import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBook;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
@@ -26,11 +27,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -40,10 +45,9 @@ public class UserService {
     private final UserRepo userRepo;
     private final RoomRepo roomRepo;
     private final ReservationRepo reservationRepo;
-    private static final Integer PAGE_SIZE=1;
 
     public Page<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime, Integer pageNo){
-        Pageable pageable = PageRequest.of(pageNo, PAGE_SIZE);
+        Pageable pageable = PageRequest.of(pageNo-1, PaginationReceiver.PAGE_SIZE);
         return roomRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,pageable);
 
     }
@@ -57,14 +61,16 @@ public class UserService {
 //        // 1. find the room
         Room room = roomRepo.findRoomExistence(businessId, bookRoomDto.getRoomNumber(), bookRoomDto.getCheckInTime(),bookRoomDto.getCheckoutTime(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found or already rented or not available for renting"));
-//
+
 //        2. calculate total price
 
         BigDecimal totalPrice = BookingPolicy.roomPrizeForDuration(
                 bookRoomDto.getCheckInTime(),bookRoomDto.getCheckoutTime(),room.getPricePerHour())
                 .orElseThrow(() -> new BookingCancellationException("Invalid duration provided for booking"));
 
-
+        if(!(totalPrice.compareTo(bookRoomDto.getUserProvidePrice().setScale(2, RoundingMode.HALF_UP)) ==0)){
+            throw new BookingCancellationException("Provided amount does not match the price provided for booking. Expected price:"+totalPrice+" ,user provided price"+bookRoomDto.getUserProvidePrice());
+        }
 //
 //
 //        // 4. deduct user balance
@@ -92,27 +98,20 @@ public class UserService {
         return businessRepo.findBusiness(findbusinessdto.getBusinessName(),findbusinessdto.getCity(),findbusinessdto.getLocation());
     }
 
-    public List<Business> findAllAvailableBusinesses() {
-        return businessRepo.findAvailableBusiness();
+    public Page<Business> findAllAvailableBusinesses(Integer pageNo) {
+        Pageable pageRequest = PageRequest.of(pageNo-1, PaginationReceiver.PAGE_SIZE);
+        return businessRepo.findAvailableBusiness(pageRequest);
     }
 
-    public HashMap<ReservationTable,BigDecimal> findBookingsOfParticularUser(String name, Long businessId) {
-        List<ReservationTable> bookingsOfParticularUser = reservationRepo.findBookingsOfParticularUser(name, businessId, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
-        HashMap<ReservationTable,BigDecimal> map=new HashMap<>();
-         bookingsOfParticularUser.forEach(booking -> {
-                    Duration duration = Duration.between(booking.getCheckInDate(), booking.getCheckoutDate());
-                    BigDecimal pricePerHour = booking.getPricePerHr();
-                    BigDecimal refundableAmt;
-                    if(booking.getCheckInDate().isBefore(LocalDateTime.now()))
-                        refundableAmt=new BigDecimal("0.00");
-                    else
-                     refundableAmt = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
-                    map.put(booking,refundableAmt);
-                }
-        );
-         return map;
+    public Page<ReservationTable> findBookingsOfParticularUser(String name, Long businessId,Integer pageNo) {
+        Pageable pageRequest = PageRequest.of(pageNo - 1, PaginationReceiver.PAGE_SIZE);
+        Page<ReservationTable> bookingsOfParticularUser = reservationRepo.findBookingsOfParticularUser(name, businessId, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
+        return bookingsOfParticularUser;
+
+
 
     }
+
 
     public void cancelBooking(CancelBookingDto
             roomBookingCancel, String userEmail, Long businessId) {

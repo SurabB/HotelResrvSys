@@ -35,7 +35,13 @@
     </tr>
     </tbody>
 </table>
+<th:block th:if="${allUnapprovedUsers.size()>0}">
 
+    <th:block
+            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/admin/resource/adminApprove},${paginationReceiver})}">
+
+    </th:block>
+</th:block>
 <div>
     <a th:href="@{/admin/resource/dashboard}">Back</a>
 </div>

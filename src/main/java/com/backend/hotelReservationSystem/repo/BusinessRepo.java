@@ -1,6 +1,8 @@
 package com.backend.hotelReservationSystem.repo;
 
 import com.backend.hotelReservationSystem.entity.Business;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,5 +16,5 @@ public interface BusinessRepo extends JpaRepository<Business,Long> {
     Optional<Business> findBusiness(String businessName, String city, String location);
 
     @Query("select b from Business b join b.user u where u.isActive=true")
-    List<Business> findAvailableBusiness();
+    Page<Business> findAvailableBusiness(Pageable pageable);
 }
