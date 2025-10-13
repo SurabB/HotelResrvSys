@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <style>
+    .active-Page{
+      color:blue;
+    }
+
+  </style>
+</head>
+<body>
+<div th:fragment="paginationDisplay(pageObj, pageNo)">
+
+  <!-- Previous -->
+  <span th:if="${!pageObj.isFirst(pageNo)}">
+    <a th:classappend="active-Page" th:href="@{/user/service/bookRoom(pageNo=${pageNo - 1})}">
+      Previous
+    </a>
+  </span>
+
+  <!-- Page Numbers -->
+  <span th:each="index : ${pageObj.indexes()}">
+  <a th:href="@{/user/service/bookRoom(
+      pageNo=${index},
+      checkInDate=${time.checkInDate},
+      checkoutDate=${time.checkoutDate}
+)}"
+     th:text="${index}"
+     th:classappend="${index == pageNo} ? 'active-page' : ''">
+</a>
+  </span>
+
+  <!-- Next -->
+  <span th:if="${!pageObj.isLast(pageNo)}">
+    <a th:classappend="active-Page"
+       th:href="@{/user/service/bookRoom(pageNo=${pageNo + 1})}">
+      Next
+    </a>
+  </span>
+
+</div>
+
+
+</body>
+</html>

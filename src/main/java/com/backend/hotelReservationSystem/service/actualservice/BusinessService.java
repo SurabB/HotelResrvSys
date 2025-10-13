@@ -10,7 +10,6 @@ import com.backend.hotelReservationSystem.entity.Room;
 import com.backend.hotelReservationSystem.entity.User;
 import com.backend.hotelReservationSystem.exceptionClasses.StaleUserException;
 import com.backend.hotelReservationSystem.repo.BusinessRepo;
-import com.backend.hotelReservationSystem.repo.ReservationRepo;
 import com.backend.hotelReservationSystem.repo.RoomRepo;
 import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
@@ -66,33 +65,13 @@ public class BusinessService {
 
        }
 
-
-
-
-
-
-
-    public void changeStatusOfRoom(String businessEmail,Long roomNumber) {
-
-        int changedStatus = roomRepo.changeActiveStatus(businessEmail,roomNumber);
-        if (changedStatus==0){
-            throw  new StaleUserException("user :"+businessEmail+"is a stale user");
-        }
-
-    }
-
-    public List<Room> getAllRooms(String userEmail) {
-       return roomRepo.getAllRooms(userEmail);
-
-    }
-
-    public List<Room> getAllAvailableRooms(String userEmail) {
-     return roomRepo.findAvailableRoomsByEmail(userEmail, ReservationStatus.BOOKED);
+    public List<Room> findRoomByBusinessEmail(String userEmail) {
+     return roomRepo.findRoomByBusinessEmail(userEmail, ReservationStatus.BOOKED);
     }
 
     public boolean changeRoomInfo(RoomUpdateDto roomUpdateDto, String businessEmail) {
 //   check if there is a room that has room number associated with business that user wants to change.
-        Optional<Room> particularRoomByBusinessEmail = roomRepo.findParticularRoomByBusinessEmail(roomUpdateDto.getActiveRoomNumber(), businessEmail, ReservationStatus.BOOKED);
+        Optional<Room> particularRoomByBusinessEmail = roomRepo.findParticularRoomByBusinessEmail(roomUpdateDto.getActiveRoomNumber(), businessEmail);
 
         //if no room exist returns false->room has been removed or user passed inaccurate room number
       if(particularRoomByBusinessEmail.isEmpty()){
@@ -102,11 +81,11 @@ public class BusinessService {
       //if exist get the room
         Room room = particularRoomByBusinessEmail.get();
 
-      //get the room number that the user wants to change to.
-        Long userProvideNumber = roomUpdateDto.getRoomNumber();
+      //get the room status that the user wants to change to.
+        Boolean userProvidedStatus = roomUpdateDto.getRoomIsActive();
 
-        if(userProvideNumber!= null&&!userProvideNumber.equals(room.getRoomNumber())&&userProvideNumber>0){
-            room.setRoomNumber(userProvideNumber);
+        if(userProvidedStatus!= null){
+            room.setRoomIsActive(!userProvidedStatus);
       }
 
         //null and empty check for optional field
@@ -125,7 +104,7 @@ public class BusinessService {
     }
 
     public Map<Room,ReservationTable> findBookedRooms(String businessEmail) {
-        List<Room> bookedReservationAndRooms = roomRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED);
+        List<Room> bookedReservationAndRooms = roomRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
          return bookedReservationAndRooms.stream().collect(Collectors.toMap(room -> room, room -> room.getReservation().getFirst()));
 
 

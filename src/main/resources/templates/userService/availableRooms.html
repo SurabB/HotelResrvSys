@@ -6,6 +6,13 @@
     <link rel="stylesheet" th:href="@{/css/table.css}" href="../../../css/table.css"/>
 
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+    <style>
+        .active-Page{
+            background-color:blue;
+            color:white
+        }
+
+    </style>
 </head>
 <body>
 
@@ -45,6 +52,42 @@
 
 
 </table>
+<div th:if="${availableRooms.size()>0}"><!-- Previous -->
+    <span th:if="${!paginationReceiver.isFirst(paginationReceiver.pageNo)}">
+    <a th:classappend="active-Page" th:href="@{/user/service/bookRoom(
+    pageNo=${paginationReceiver.pageNo - 1},
+    checkInDate=${checkInDate},
+      checkoutDate=${checkoutDate}
+    )}">
+      Previous
+    </a>
+  </span>
+
+    <!-- Page Numbers -->
+    <span th:each="index : ${paginationReceiver.indexes()}">
+  <a th:href="@{/user/service/bookRoom(
+      pageNo=${index},
+      checkInDate=${checkInDate},
+      checkoutDate=${checkoutDate}
+)}"
+     th:text="${index}"
+     th:classappend="${index == paginationReceiver.pageNo} ? 'active-Page' : ''">
+</a>
+  </span>
+
+    <!-- Next -->
+    <span th:if="${!paginationReceiver.isLast(paginationReceiver.pageNo)}">
+    <a th:classappend="active-Page"
+       th:href="@{/user/service/bookRoom(
+       pageNo=${paginationReceiver.pageNo + 1},
+       checkInDate=${checkInDate},
+      checkoutDate=${checkoutDate}
+       )}">
+      Next
+    </a>
+  </span>
+
+</div>
 <br>
 <a th:href="@{/user/service/businessPage}">Back</a>
 <br>

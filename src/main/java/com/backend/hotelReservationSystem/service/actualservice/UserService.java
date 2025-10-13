@@ -20,6 +20,9 @@ import com.backend.hotelReservationSystem.utils.BookingPolicy;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -37,9 +40,11 @@ public class UserService {
     private final UserRepo userRepo;
     private final RoomRepo roomRepo;
     private final ReservationRepo reservationRepo;
+    private static final Integer PAGE_SIZE=1;
 
-    public List<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime){
-        return roomRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
+    public Page<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime, Integer pageNo){
+        Pageable pageable = PageRequest.of(pageNo, PAGE_SIZE);
+        return roomRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,pageable);
 
     }
 
@@ -97,7 +102,11 @@ public class UserService {
          bookingsOfParticularUser.forEach(booking -> {
                     Duration duration = Duration.between(booking.getCheckInDate(), booking.getCheckoutDate());
                     BigDecimal pricePerHour = booking.getPricePerHr();
-                    BigDecimal refundableAmt = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
+                    BigDecimal refundableAmt;
+                    if(booking.getCheckInDate().isBefore(LocalDateTime.now()))
+                        refundableAmt=new BigDecimal("0.00");
+                    else
+                     refundableAmt = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
                     map.put(booking,refundableAmt);
                 }
         );
@@ -108,14 +117,14 @@ public class UserService {
     public void cancelBooking(CancelBookingDto
             roomBookingCancel, String userEmail, Long businessId) {
         Optional<ReservationTable> bookedRoomOfParticularUser = reservationRepo.findBookedRoomOfParticularUser(roomBookingCancel.getRoomNumber(),roomBookingCancel.getCheckInTime(),roomBookingCancel.getCheckoutTime(), userEmail, businessId, ReservationStatus.BOOKED);
-        ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Booking Cancellation failed either due to no active booking or user is already checked in or due to invalid credentials "));
-         if(reservationTable.getCheckInDate().minusMinutes(5).isBefore(LocalDateTime.now())){
-             throw new BookingCancellationException("Cannot cancel Booking after checkIn or five minutes before checkIn");
+        ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Booking Cancellation failed either due to no active booking or due to invalid credentials "));
+         if(!reservationTable.getCheckInDate().isAfter(LocalDateTime.now())){
+             throw new BookingCancellationException("Cannot cancel Bookings after checkedIn time");
          }
+
         BigDecimal pricePerHour = reservationTable.getPricePerHr();
         BigDecimal userPaidAmt = reservationTable.getPaymentAmt();
         Duration duration = Duration.between(reservationTable.getCheckInDate(), reservationTable.getCheckoutDate());
-
         BigDecimal priceToReturn = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
         int userSuccess = userRepo.addUserBalance(priceToReturn, userEmail);
         int businessSuccess = userRepo.deductBusinessBalance(businessId, priceToReturn);
@@ -130,5 +139,16 @@ public class UserService {
         reservationTable.setPaymentAmt(userPaidAmt.subtract(priceToReturn));
         reservationRepo.save(reservationTable);
 
+    }
+    public boolean earlyCheckout(CancelBookingDto earlyCheckout,String userEmail,Long businessId){
+        Optional<ReservationTable> bookedRoomOfParticularUser = reservationRepo.findBookedRoomOfParticularUser(earlyCheckout.getRoomNumber(),earlyCheckout.getCheckInTime(),earlyCheckout.getCheckoutTime(), userEmail, businessId, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
+        ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Early Checkout failed either due to no active booking or due to invalid credentials "));
+        if(!reservationTable.getCheckInDate().isAfter(LocalDateTime.now())&&!reservationTable.getCheckoutDate().isBefore(LocalDateTime.now())){
+            reservationTable.setStatus(ReservationStatus.EARLY_CHECKED_OUT);
+            reservationTable.setCheckoutDate(LocalDateTime.now());
+            reservationRepo.save(reservationTable);
+            return true;
+        }
+        return false;
     }
 }

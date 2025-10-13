@@ -33,3 +33,6 @@ Thumbs.db
 # Other
 *.swp
 HELP.md
+mvnw
+mvnw.cmd
+.gitattributes

@@ -17,8 +17,10 @@
     <tr>
         <th>SNo</th>
         <th>RoomNo</th>
-        <th>PricePerHour</th>
+        <th>Present PricePerHour</th>
+        <th>Booked PricePerHour</th>
         <th>Room Type</th>
+        <th>Room status</th>
         <th>Active Status</th>
         <th>Booking Date</th>
         <th>CheckIng Date</th>
@@ -32,7 +34,9 @@
       <td th:text="${roomStat.count}"></td>
         <td th:text="${element.key.roomNumber}"></td>
         <td th:text="${element.key.pricePerHour}"></td>
-        <td th:text="${element.key.roomType}"></td>
+        <td th:text="${element.value.pricePerHr}"></td>
+        <td th:text="${element.value.roomType}"></td>
+        <td th:text="${element.value.status}"></td>
         <td th:text="${element.key.roomIsActive}"></td>
         <td th:text="${element.value.bookingDate}"></td>
         <td th:text="${element.value.checkInDate}"></td>

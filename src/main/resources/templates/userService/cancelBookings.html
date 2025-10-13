@@ -7,24 +7,29 @@
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
 
 </head>
+<script>
+    function confirmAction(button) {
+        const action = button.dataset.action;
+        const roomNumber = button.dataset.roomNumber;
+        return confirm(`Do you really want to ${action} for Room number ${roomNumber}?`);
+    }
+</script>
 <body>
 
 <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
-
+<div th:text="|BusinessName:${business.businessName}, city:${business.cityName}, location:${business.location}|"></div>
 <table th:if="${bookingsAndRefundableAmt.size() > 0}">
     <thead>
     <tr>
         <th>SNo</th>
-        <th>Business</th>
-        <th>City</th>
-        <th>Location</th>
         <th>Room No</th>
         <th>Booking Date</th>
         <th>Check In Date</th>
         <th>Checkout Date</th>
         <th>Status</th>
+        <th>Room Type</th>
         <th> Amount paid for Booking Room</th>
         <th>Penalty Amt(5% of paid amt) </th>
         <th> Expected amount you will get(if cancelled now)</th>
@@ -32,27 +37,33 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="booking,bookingStat:${bookingsAndRefundableAmt}">
+    <tr th:each="booking,bookingStat:${bookingsAndRefundableAmt}" th:with="earlyCheckout=${booking.value.compareTo(T(java.math.BigDecimal).ZERO) == 0}">
         <td th:text="${bookingStat.count}"></td>
-        <td th:text="${business.businessName}"></td>
-        <td th:text="${business.cityName}"></td>
-        <td th:text="${business.location}"></td>
         <td th:text="${booking.key.room.roomNumber}"></td>
         <td th:text="${booking.key.bookingDate}"></td>
         <td th:text="${booking.key.checkInDate}"></td>
         <td th:text="${booking.key.checkoutDate}"></td>
         <td th:text="${booking.key.status}"></td>
+        <td th:text="${booking.key.roomType}"></td>
         <td th:text="${booking.key.paymentAmt}"></td>
-        <td th:text="${booking.key.paymentAmt}-${booking.value}"></td>
+        <td th:text="${earlyCheckout
+              ? booking.value
+              : booking.key.paymentAmt.subtract(booking.value)}">
+        </td>
         <td th:text="${booking.value}"> </td>
         <td>
-            <form th:action="@{/user/service/cancelBooking}" method="post">
+            <form th:action="${earlyCheckout}? @{/user/service/earlyCheckout}:@{/user/service/cancelBooking}" method="post">
                 <input type="hidden" name="roomNumber" th:value="${booking.key.room.roomNumber}">
                 <input type="hidden" name="checkInTime" th:value="${booking.key.checkInDate}">
                 <input type="hidden" name="checkoutTime" th:value="${booking.key.checkoutDate}">
 
 
-                <button type="submit" th:onclick="|return confirm('Do you really want to cancel booking for Room number'+${booking.key.room.roomNumber}+'?);'+|">Submit</button>
+                <button type="submit"
+                        th:data-action="${earlyCheckout ? 'Checkout Early' : 'Cancel Booking'}"
+                        th:data-room-number="${booking.key.room.roomNumber}"
+                        th:text="${earlyCheckout ? 'Checkout Early' : 'Cancel Booking'}"
+                        onclick="return confirmAction(this)">
+                </button>
             </form>
         </td>
     </tr>

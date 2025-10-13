@@ -8,7 +8,6 @@ import com.backend.hotelReservationSystem.entity.Room;
 import com.backend.hotelReservationSystem.exceptionClasses.CustomMethodArgFailedException;
 import com.backend.hotelReservationSystem.service.actualservice.BusinessService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -90,33 +89,10 @@ public class BusinessController {
 
     }
 
-    @GetMapping("/changeRoomStatus")
-    public String changeRoomStatus(Principal principal, Model model){
-        List<Room> allRooms = businessService.getAllRooms(principal.getName());
-        model.addAttribute("allRooms",allRooms);
-        return "businessService/changeRoomStatus";
-
-    }
-
-    @PostMapping("/changeRoomStatus")
-    @Validated
-    public String changeRoomStatus(@NotNull(message = "room Number should not be blank") @RequestParam("roomNumber") Long roomNumber, Principal principal, RedirectAttributes redirectAttributes){
-        try {
-
-            businessService.changeStatusOfRoom(principal.getName(),roomNumber);
-                redirectAttributes.addFlashAttribute("success", "Room status changed successfully!");
-                return "redirect:/business/service/changeRoomStatus";
-        }
-        catch (Exception ex) {
-            redirectAttributes.addFlashAttribute("failure", "Something went wrong on server side.");
-            return "redirect:/business/service/changeRoomStatus";
-        }
-
-    }
     @GetMapping("/changeRoomInfo")
     public String changeRoomInfo(Principal principal, Model model){
-        List<Room> allAvailableRooms = businessService.getAllAvailableRooms(principal.getName());
-        model.addAttribute("allAvailableRooms",allAvailableRooms);
+        List<Room> allRooms = businessService.findRoomByBusinessEmail(principal.getName());
+        model.addAttribute("allRooms",allRooms);
         return "businessService/changeRoomInfo";
     }
     @PostMapping("/changeRoomInfo")
@@ -131,10 +107,6 @@ public class BusinessController {
                 return "redirect:/business/service/changeRoomInfo";
             }
             redirectAttributes.addFlashAttribute("failure", "invalid credentials.");
-            return "redirect:/business/service/changeRoomInfo";
-        }
-        catch (DataIntegrityViolationException ex) {
-            redirectAttributes.addFlashAttribute("failure", "Room number already exist for that room. provide different roomNumber.");
             return "redirect:/business/service/changeRoomInfo";
         }
         catch (Exception ex) {

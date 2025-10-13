@@ -13,11 +13,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Getter
 @Setter
-@AtLeastOneField(message = "At least one field must be provided and Room Type should not be blank and its length must be less than 50 if provided")
+@AtLeastOneField(message = "At least one field must be provided and Room Type should not be blank if provided and its length must be less than 50")
 public class RoomUpdateDto {
-    @Positive(message = "Room Number should be Greater than Zero")
-    @Max(value=9999999999L,message = "Room Number should not exceed ten digit")
-    private Long roomNumber;
 
     @NotNull(message = "Invalid credentials")
     private Long activeRoomNumber;
@@ -27,4 +24,6 @@ public class RoomUpdateDto {
     private BigDecimal pricePerHour;
 
     private String roomType;
+
+    private Boolean roomIsActive;
 }

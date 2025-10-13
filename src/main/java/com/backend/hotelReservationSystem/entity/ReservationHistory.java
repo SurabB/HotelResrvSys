@@ -24,6 +24,9 @@ public class ReservationHistory {
     @Column(name = "reservation_id", nullable = false)
     private Long reservationId;
 
+    @Column(nullable = false,name="room_type")
+    private String roomType;
+
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;

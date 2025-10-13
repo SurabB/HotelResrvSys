@@ -22,10 +22,10 @@ public class MyScheduledTask {
 
     @Transactional
     //@Scheduled(fixedDelay = 60000)
-    @Scheduled(cron = "0 00 12 * * *")
+    //@Scheduled(cron = "0 00 12 * * *")
     public void runDailyTask() {
         try {
-            List<ReservationTable> cancelledAndCheckedOutRooms = reservationRepo.findRoomsWithStatusCheckoutAndCancelled(ReservationStatus.CHECKED_OUT, ReservationStatus.CANCELLED);
+            List<ReservationTable> cancelledAndCheckedOutRooms = reservationRepo.findRoomsWithStatusExceptCheckedInAndBooked(ReservationStatus.CHECKED_IN, ReservationStatus.BOOKED);
             List<ReservationHistory> reservationHistory = cancelledAndCheckedOutRooms.stream().map(reservationTable -> CustomBuilder.createReservationHistoryObj(reservationTable)).toList();
             if(!cancelledAndCheckedOutRooms.isEmpty()) {
                 log.info("Fetched {} reservations, saving {} history entries", cancelledAndCheckedOutRooms.size(), reservationHistory.size());

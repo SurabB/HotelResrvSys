@@ -18,7 +18,10 @@ public interface ReservationRepo extends JpaRepository<ReservationTable,Long> {
 @Query("select rt from ReservationTable rt join fetch rt.room r join rt.user u join r.business b where b.businessId=:businessId and r.roomNumber=:roomNo and u.email=:userEmail and b.user.isActive=true and rt.status=:booked and rt.checkInDate=:checkInDate and rt.checkoutDate=:checkoutDate")
     Optional<ReservationTable> findBookedRoomOfParticularUser(Long roomNo,LocalDateTime checkInDate,LocalDateTime checkoutDate, String userEmail, Long businessId,ReservationStatus booked);
 
-    @Query("select rt from ReservationTable rt join fetch rt.user u join fetch rt.room r join fetch r.business b where rt.status = :reservationStatus or rt.status = :reservationStatus1")
-    List<ReservationTable> findRoomsWithStatusCheckoutAndCancelled(ReservationStatus reservationStatus,
-                                                                   ReservationStatus reservationStatus1);
+    @Query("select rt from ReservationTable rt join fetch rt.room r join rt.user u join r.business b where b.businessId=:businessId and r.roomNumber=:roomNo and u.email=:userEmail and b.user.isActive=true and (rt.status=:booked or rt.status=:checkedIn)and rt.checkInDate=:checkInDate and rt.checkoutDate=:checkoutDate")
+    Optional<ReservationTable> findBookedRoomOfParticularUser(Long roomNo,LocalDateTime checkInDate,LocalDateTime checkoutDate, String userEmail, Long businessId,ReservationStatus booked,ReservationStatus checkedIn);
+
+    @Query("select rt from ReservationTable rt join fetch rt.user u join fetch rt.room r join fetch r.business b where rt.status not in (:checkedIn ,:booked)")
+    List<ReservationTable> findRoomsWithStatusExceptCheckedInAndBooked(ReservationStatus checkedIn,
+                                                                   ReservationStatus booked);
 }
