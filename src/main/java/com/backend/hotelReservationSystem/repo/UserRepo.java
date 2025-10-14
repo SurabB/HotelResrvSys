@@ -27,16 +27,14 @@ public interface UserRepo extends JpaRepository<User,Long> {
     int deductBusinessBalance(Long businessId, BigDecimal priceToReturn);
 
     @Modifying
-    @Transactional
     @Query("update User u set u.bankBalance = u.bankBalance - :totalPrice where u.userId = :userId and u.bankBalance>=:totalPrice")
     int deductUserBalance(Long userId, BigDecimal totalPrice);
 
     @Modifying
-    @Transactional
     @Query("update User u set u.bankBalance = u.bankBalance + :totalPrice  where u.userId = :businessId")
     int addBusinessBalance(Long businessId, BigDecimal totalPrice);
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Query("Update User u set u.isAdminApproved =true where u.email = :email and u.isEmailVerified=true")
     int approveUserByEmail(String email);
 

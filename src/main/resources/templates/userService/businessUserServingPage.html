@@ -25,11 +25,11 @@
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
 <br>
-<a th:href="@{/user/service/getRoom}" target="_blank" rel="noopener noreferrer">
+<a th:href="@{/user/service/getRoom}">
     Book Room
 </a>
 <br>
-<a th:href="@{/user/service/cancelBooking}" target="_blank" rel="noopener noreferrer">Cancel Booking</a>
+<a th:href="@{/user/service/cancelBooking}">Cancel Booking</a>
 
 
 <form th:action="@{/user/service/logout}" method="post">

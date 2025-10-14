@@ -35,6 +35,4 @@ public interface RoomRepo extends JpaRepository<Room,Long> {
     @Query("select r from Room r join r.business b join b.user u where r.roomNumber=:roomNumber and u.email=:businessEmail and u.isActive=true")
     Optional<Room> findParticularRoomByBusinessEmail(Long roomNumber, String businessEmail);
 
-    @Query("select rt from ReservationTable rt join fetch rt.room r where r.business.user.email = :businessEmail and (rt.status = :booked or rt.status = :checkedIn) and rt.checkoutDate>now")
-    Page<ReservationTable> findBookedReservationAndRooms(String businessEmail, ReservationStatus booked, ReservationStatus checkedIn,LocalDateTime now, Pageable pageable);
 }
