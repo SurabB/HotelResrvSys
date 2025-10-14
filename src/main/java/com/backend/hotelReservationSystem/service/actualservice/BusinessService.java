@@ -11,6 +11,7 @@ import com.backend.hotelReservationSystem.entity.Room;
 import com.backend.hotelReservationSystem.entity.User;
 import com.backend.hotelReservationSystem.exceptionClasses.StaleUserException;
 import com.backend.hotelReservationSystem.repo.BusinessRepo;
+import com.backend.hotelReservationSystem.repo.ReservationRepo;
 import com.backend.hotelReservationSystem.repo.RoomRepo;
 import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
@@ -37,6 +38,7 @@ public class BusinessService {
    private final BusinessRepo businessRepo;
    private final RoomRepo roomRepo;
    private final UserRepo userRepo;
+   private final ReservationRepo reservationRepo;
    // if request succeeds, business get added to db
    public void addBusiness(BusinessRegAcceptor businessRegAcceptor,String username){
 
@@ -111,7 +113,7 @@ public class BusinessService {
 
     public Page<ReservationTable> findBookedRooms(String businessEmail, Integer pageNo) {
         Pageable  pageRequest = PageRequest.of(pageNo - 1, PaginationReceiver.PAGE_SIZE);
-        return roomRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
+        return reservationRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
 
 
 
