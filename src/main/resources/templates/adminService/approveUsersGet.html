@@ -29,6 +29,7 @@
         <td>
             <form th:action="@{/admin/resource/adminApprove}" method="post">
                 <input type="hidden" name="email" th:value="${user.email}" />
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
                 <button type="submit">Approve</button>
             </form>
         </td>

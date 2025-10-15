@@ -12,7 +12,7 @@ import java.util.ArrayDeque;
 public class PaginationReceiver {
     private final Integer totalPages;
     private  final Integer pageNo;
-    private static final int PAGE_DISPLAY=3;
+    private static final int PAGE_DISPLAY=2;
     public static final int PAGE_SIZE=1;
 
     public ArrayDeque<Integer> indexes(){
@@ -20,20 +20,20 @@ public class PaginationReceiver {
         ArrayDeque<Integer> indexes= new ArrayDeque<>();
         boolean entered=false;
         for(int i=0;i<PAGE_DISPLAY&&i<totalPages;i++){
-            if(isFirst(count)){
+            if(isLast(count)){
                 entered=true;
-                indexes.addFirst(count);
-                count=pageNo+1;
+                indexes.add(count);
+                count=pageNo-1;
                 continue;
             }
             if (entered) {
-                indexes.add(count);
-                count++;
+                indexes.addFirst(count);
+                count--;
 
             }
             else{
-                indexes.addFirst(count);
-                count--;
+                indexes.add(count);
+                count++;
             }
 
         }

@@ -94,18 +94,27 @@ public class BusinessController {
     }
 
     @GetMapping("/changeRoomInfo")
-    public String changeRoomInfo(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo, Principal principal, Model model){
+    public String changeRoomInfo(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo,RedirectAttributes redirectAttributes, Principal principal, Model model){
         Page<Room> allRooms = businessService.findRoomByBusinessEmail(principal.getName(),pageNo);
-        PaginationReceiver paginationReceiver = new PaginationReceiver(allRooms.getTotalPages(), pageNo);
+        int totalPages=allRooms.getTotalPages();
+        //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
+        if(totalPages>0&& totalPages<pageNo){
+            redirectAttributes.addAttribute("pageNo",totalPages);
+            return "redirect:/business/service/changeRoomInfo";
+        }
+        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
         model.addAttribute("paginationReceiver",paginationReceiver);
         model.addAttribute("allRooms",allRooms.toList());
         return "businessService/changeRoomInfo";
     }
     @PostMapping("/changeRoomInfo")
-    public  String changeRoomInfo(@Valid @ModelAttribute RoomUpdateDto roomUpdateDto, BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes){
+    public  String changeRoomInfo(@Valid @ModelAttribute RoomUpdateDto roomUpdateDto, BindingResult bindingResult,
+                                  @RequestParam(value = "pageNo",defaultValue = "1")Integer pageNo,
+                                  Principal principal, RedirectAttributes redirectAttributes){
         if (bindingResult.hasErrors()){
             throw new CustomMethodArgFailedException("redirect:/business/service/changeRoomInfo",bindingResult);
         }
+        redirectAttributes.addAttribute("pageNo",pageNo);
         try {
             boolean changed = businessService.changeRoomInfo(roomUpdateDto, principal.getName());
             if (changed) {
@@ -122,8 +131,16 @@ public class BusinessController {
 
     }
     @GetMapping("/findBookedRooms")
-    public String findBookedRooms(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo, Principal principal, Model model){
+    public String findBookedRooms(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo,
+                                  RedirectAttributes redirectAttributes,
+                                  Principal principal, Model model){
         Page<ReservationTable> bookedRoomsPage = businessService.findBookedRooms(principal.getName(),pageNo);
+        int totalPages=bookedRoomsPage.getTotalPages();
+        //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
+        if(totalPages>0&& totalPages<pageNo){
+            redirectAttributes.addAttribute("pageNo",totalPages);
+            return "redirect:/business/service/findBookedRooms";
+        }
         Map<ReservationTable,Room >bookedRooms = bookedRoomsPage.stream().collect(Collectors.toMap(Function.identity(), reservationTable -> reservationTable.getRoom()));
         PaginationReceiver paginationReceiver = new PaginationReceiver(bookedRoomsPage.getTotalPages(), pageNo);
         model.addAttribute("paginationReceiver",paginationReceiver);

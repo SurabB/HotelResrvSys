@@ -37,6 +37,8 @@
                     <input type="hidden" name="checkInTime" th:value="${checkInDate}">
                     <input type="hidden" name="checkoutTime" th:value="${checkoutDate}">
                     <input type="hidden" name="userProvidePrice" th:value="${room.value}">
+                    <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+
 
                     <button type="submit" onclick="return confirm('Do you really want to Book room');">Book</button>
                 </form>

@@ -44,6 +44,8 @@
             <td><button type="submit">Change Room Info</button></td>
 
             <input type="hidden" name="activeRoomNumber" th:value="${room.roomNumber}">
+            <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+
         </form>
     </tr>
 

@@ -50,7 +50,13 @@ public class UserController {
         try {
             //gets all businesses which are active from db.
             Page<Business> allAvailableBusinesses = userService.findAllAvailableBusinesses(pageNo);
-            PaginationReceiver paginationReceiver = new PaginationReceiver(allAvailableBusinesses.getTotalPages(), pageNo);
+            int totalPages=allAvailableBusinesses.getTotalPages();
+            //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
+            if(totalPages>0&& totalPages<pageNo){
+                redirectAttributes.addAttribute("pageNo",totalPages);
+                return "redirect:/user/service/getBusiness";
+            }
+            PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
             model.addAttribute("paginationReceiver",paginationReceiver);
             model.addAttribute("allAvailableBusinesses", allAvailableBusinesses.toList());
             return "userService/displayAllAvailableBusinesses";
@@ -62,12 +68,13 @@ public class UserController {
 
     //post request ,if succeed user selects a particular business as a service provider
     @PostMapping("/getBusiness")
-    public String getBusiness(@Valid @ModelAttribute FindBusinessDto findbusinessdto, Model model, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String getBusiness(@Valid @ModelAttribute FindBusinessDto findbusinessdto, BindingResult bindingResult,@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo, Model model, RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
             String firstError = bindingResult.getAllErrors().getFirst().getDefaultMessage();
             redirectAttributes.addFlashAttribute("failure", firstError);
             return "redirect:/user/service/getBusiness";
         }
+        redirectAttributes.addAttribute("pageNo",pageNo);
 
         // 1 findBusinessDto-> businessName,city,location (combined unique in db)
         // 2 find businesses having provided credentials.
@@ -144,9 +151,15 @@ catch (Exception e) {
             return "redirect:/user/service/getRoom";
         }
         Page<Room> availableRoomsFromDb = userService.findAvailableRooms(business.getBusinessUuid(),time,pageNo);
-
+        int totalPages=availableRoomsFromDb.getTotalPages();
+        //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
+        if(totalPages>0&& totalPages<pageNo){
+            redirectAttributes.addFlashAttribute("time",time);
+            redirectAttributes.addAttribute("pageNo",totalPages);
+            return "redirect:/user/service/bookRoom";
+        }
         Map<Room, BigDecimal> availableRoomsWithPrize = availableRoomsFromDb.stream().collect(Collectors.toMap(availableRoom -> availableRoom, availableRoom -> BookingPolicy.roomPrizeForDuration(time.getCheckInDate(), time.getCheckoutDate(), availableRoom.getPricePerHour()).orElseThrow(() -> new BookingCancellationException("Invalid Duration provided"))));
-        PaginationReceiver paginationReceiver = new PaginationReceiver(availableRoomsFromDb.getTotalPages(), pageNo);
+        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
         model.addAttribute("availableRooms", availableRoomsWithPrize);
         model.addAttribute("checkInDate",time.getCheckInDate());
         model.addAttribute("checkoutDate",time.getCheckoutDate());
@@ -156,7 +169,9 @@ catch (Exception e) {
 
    // if succeed user books room from a selected business
     @PostMapping("/bookRoom")
-    public String bookRoom(@Valid @ModelAttribute("bookRoomDto") RoomBook roomBook, BindingResult bindingResult, @SessionAttribute(value = "business",required = false) Business business, Principal principal, RedirectAttributes redirectAttributes) {
+    public String bookRoom(@Valid @ModelAttribute RoomBook roomBook,
+                           BindingResult bindingResult, @SessionAttribute(value = "business",required = false) Business business,
+                           @RequestParam(name = "pageNo",defaultValue = "1")Integer pageNo, Principal principal, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()){
            throw new CustomMethodArgFailedException("redirect:/user/service/getRoom",bindingResult);
         }
@@ -164,7 +179,10 @@ catch (Exception e) {
             redirectAttributes.addFlashAttribute("failure", "Select Business to continue");
             return "redirect:/user/service/getBusiness";
         }
+        redirectAttributes.addAttribute("pageNo",pageNo);
 
+        BookingPolicy.BookingTime time=new BookingPolicy.BookingTime(roomBook.getCheckInTime(),roomBook.getCheckoutTime());
+        redirectAttributes.addFlashAttribute("time",time);
         try {
             // 1 fetches current context user
             String username = principal.getName();
@@ -178,20 +196,15 @@ catch (Exception e) {
 
             // 2 books room based on above credentials
            userService.bookRoom(roomBook,user,business.getBusinessId());
-           BookingPolicy.BookingTime bookingTime=new BookingPolicy.BookingTime(roomBook.getCheckInTime(),roomBook.getCheckoutTime());
-           redirectAttributes.addFlashAttribute("time",bookingTime);
+            System.out.println("in room book post success"+time);
             redirectAttributes.addFlashAttribute("success", "Room booked successfully");
             return "redirect:/user/service/bookRoom";
         }
         catch (BookingCancellationException | RoomNotFoundException | InsufficientBalanceException e){
-            BookingPolicy.BookingTime bookingTime=new BookingPolicy.BookingTime(roomBook.getCheckInTime(),roomBook.getCheckoutTime());
-            redirectAttributes.addFlashAttribute("time",bookingTime);
             redirectAttributes.addFlashAttribute("failure", e.getMessage());
             return "redirect:/user/service/bookRoom";
         }
         catch(Exception e) {
-            BookingPolicy.BookingTime bookingTime=new BookingPolicy.BookingTime(roomBook.getCheckInTime(),roomBook.getCheckoutTime());
-            redirectAttributes.addFlashAttribute("time",bookingTime);
             redirectAttributes.addFlashAttribute("failure","something went wrong on server");
             return "redirect:/user/service/bookRoom";
         }
@@ -206,8 +219,14 @@ catch (Exception e) {
         }
         try {
             Page<ReservationTable> bookingsAndRefundableAmtpage = userService.findBookingsOfParticularUser(principal.getName(), business.getBusinessId(),pageNo);
+            int totalPages=bookingsAndRefundableAmtpage.getTotalPages();
+            //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
+            if(totalPages>0&& totalPages<pageNo){
+                redirectAttributes.addAttribute("pageNo",totalPages);
+                return "redirect:/user/service/cancelBooking";
+            }
             Map<ReservationTable, BigDecimal> bookingsAndRefundableAmt = SomeHelpers.convertToMap(bookingsAndRefundableAmtpage.toList());
-            PaginationReceiver paginationReceiver = new PaginationReceiver(bookingsAndRefundableAmtpage.getTotalPages(), pageNo);
+            PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
             model.addAttribute("bookingsAndRefundableAmt", bookingsAndRefundableAmt);
             model.addAttribute("paginationReceiver",paginationReceiver);
             return "userService/cancelBookings";
@@ -219,11 +238,17 @@ catch (Exception e) {
 
     //if succeeded, user cancels the particular room booking
     @PostMapping("/cancelBooking")
-    public String cancelBooking(@Valid @ModelAttribute CancelBookingDto roomBookingCancel , RedirectAttributes redirectAttributes, Principal principal, @SessionAttribute(value = "business",required = false) Business business) {
+    public String cancelBooking(@Valid @ModelAttribute CancelBookingDto roomBookingCancel ,
+                                BindingResult bindingResult, @RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo,
+                                RedirectAttributes redirectAttributes, Principal principal, @SessionAttribute(value = "business",required = false) Business business) {
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/user/service/cancelBooking",bindingResult);
+        }
         if(business==null) {
             redirectAttributes.addFlashAttribute("failure","Select Business to continue");
            return "redirect:/user/service/getBusiness";
         }
+        redirectAttributes.addAttribute("pageNo",pageNo);
         try {
             userService.cancelBooking(roomBookingCancel, principal.getName(), business.getBusinessId());
             redirectAttributes.addFlashAttribute("success", "Booking was cancelled successfully");
@@ -242,11 +267,17 @@ catch (Exception e) {
 
     }
     @PostMapping("/earlyCheckout")
-    public String earlyCheckout(@Valid @ModelAttribute CancelBookingDto earlyCheckout , RedirectAttributes redirectAttributes, Principal principal, @SessionAttribute(value = "business",required = false) Business business) {
+    public String earlyCheckout(@Valid @ModelAttribute CancelBookingDto earlyCheckout ,BindingResult bindingResult,
+                                @RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo,
+                                RedirectAttributes redirectAttributes, Principal principal, @SessionAttribute(value = "business",required = false) Business business) {
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/user/service/earlyCheckout",bindingResult);
+        }
         if (business == null) {
             redirectAttributes.addFlashAttribute("failure", "Select Business to continue");
             return "redirect:/user/service/getBusiness";
         }
+        redirectAttributes.addAttribute("pageNo",pageNo);
         try {
             boolean succeed = userService.earlyCheckout(earlyCheckout, principal.getName(), business.getBusinessId());
             if (succeed) {
