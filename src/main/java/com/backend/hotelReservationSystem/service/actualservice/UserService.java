@@ -2,6 +2,7 @@ package com.backend.hotelReservationSystem.service.actualservice;
 
 import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.userServiceDto.CancelBookingDto;
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
 import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBook;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import com.backend.hotelReservationSystem.dto.userServiceDto.FindBusinessDto;
@@ -19,23 +20,20 @@ import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.BookingCancellationPolicy;
 import com.backend.hotelReservationSystem.utils.BookingPolicy;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
+import com.backend.hotelReservationSystem.utils.SortingFields;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -46,8 +44,23 @@ public class UserService {
     private final RoomRepo roomRepo;
     private final ReservationRepo reservationRepo;
 
-    public Page<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime, Integer pageNo){
-        Pageable pageable = PageRequest.of(pageNo-1, PaginationReceiver.PAGE_SIZE);
+    public Page<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime, PageSortReceiver pageSortReceiver){
+        String sortDir = pageSortReceiver.getSortDir();
+        Pageable pageable;
+        if(SortingFields.BOOK_ROOM.contains(pageSortReceiver.getSortField())&&(
+                sortDir.equalsIgnoreCase("asc")||
+                        sortDir.equalsIgnoreCase("desc")
+                )
+        ){
+            Sort sort;
+            if(sortDir.equalsIgnoreCase("asc")){
+                sort=Sort.by(pageSortReceiver.getSortField()).ascending();
+            }
+            else  sort=Sort.by(pageSortReceiver.getSortField()).descending();
+
+            pageable = PageRequest.of(pageSortReceiver.getPageNo()-1, PaginationReceiver.PAGE_SIZE,sort);
+        }
+        else pageable = PageRequest.of(pageSortReceiver.getPageNo()-1, PaginationReceiver.PAGE_SIZE);
         return roomRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,pageable);
 
     }

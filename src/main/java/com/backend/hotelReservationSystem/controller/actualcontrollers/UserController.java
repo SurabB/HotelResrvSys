@@ -1,10 +1,8 @@
 package com.backend.hotelReservationSystem.controller.actualcontrollers;
 
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
 import com.backend.hotelReservationSystem.dto.PaginationReceiver;
-import com.backend.hotelReservationSystem.dto.userServiceDto.BookRoomDto;
-import com.backend.hotelReservationSystem.dto.userServiceDto.CancelBookingDto;
-import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBook;
-import com.backend.hotelReservationSystem.dto.userServiceDto.FindBusinessDto;
+import com.backend.hotelReservationSystem.dto.userServiceDto.*;
 import com.backend.hotelReservationSystem.entity.Business;
 import com.backend.hotelReservationSystem.entity.ReservationTable;
 import com.backend.hotelReservationSystem.entity.Room;
@@ -29,6 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -138,10 +137,16 @@ catch (Exception e) {
     }
     //if succeed provides list of available rooms(potentially for booking)
     @GetMapping("/bookRoom")
-    public String bookRoom(@ModelAttribute(value = "time")BookingPolicy.BookingTime time,
-            @RequestParam(value = "pageNo",defaultValue = "1")Integer pageNo,
-             @SessionAttribute(value = "business",required = false)Business business,
-                          Model model, RedirectAttributes redirectAttributes){
+    public String bookRoom(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,
+                           BindingResult bindingResult1,
+                           @ModelAttribute(value = "time")BookingPolicy.BookingTime time,
+                           BindingResult bindingResult2,
+                           @SessionAttribute(value = "business",required = false)Business business,
+                           Model model, RedirectAttributes redirectAttributes){
+        if(bindingResult1.hasErrors()||bindingResult2.hasErrors()){
+            redirectAttributes.addFlashAttribute("failure","Invalid credentials provided");
+            return "redirect:/user/service/getRoom";
+        }
         if(business==null) {
             redirectAttributes.addFlashAttribute("failure", "Select Business to continue");
             return "redirect:/user/service/getBusiness";
@@ -150,16 +155,17 @@ catch (Exception e) {
             redirectAttributes.addFlashAttribute("failure","First fill this form");
             return "redirect:/user/service/getRoom";
         }
-        Page<Room> availableRoomsFromDb = userService.findAvailableRooms(business.getBusinessUuid(),time,pageNo);
+        Page<Room> availableRoomsFromDb = userService.findAvailableRooms(business.getBusinessUuid(),time,pageSortReceiver);
         int totalPages=availableRoomsFromDb.getTotalPages();
         //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
-        if(totalPages>0&& totalPages<pageNo){
+        if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
             redirectAttributes.addFlashAttribute("time",time);
             redirectAttributes.addAttribute("pageNo",totalPages);
             return "redirect:/user/service/bookRoom";
         }
-        Map<Room, BigDecimal> availableRoomsWithPrize = availableRoomsFromDb.stream().collect(Collectors.toMap(availableRoom -> availableRoom, availableRoom -> BookingPolicy.roomPrizeForDuration(time.getCheckInDate(), time.getCheckoutDate(), availableRoom.getPricePerHour()).orElseThrow(() -> new BookingCancellationException("Invalid Duration provided"))));
-        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
+        Map<Room, BigDecimal> availableRoomsWithPrize = availableRoomsFromDb.stream().collect(Collectors.toMap(Function.identity(), availableRoom -> BookingPolicy.roomPrizeForDuration(time.getCheckInDate(), time.getCheckoutDate(), availableRoom.getPricePerHour()).orElseThrow(() -> new BookingCancellationException("Invalid Duration provided"))
+                ,(existing,replacement)->existing,()->new LinkedHashMap<>()));
+        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
         model.addAttribute("availableRooms", availableRoomsWithPrize);
         model.addAttribute("checkInDate",time.getCheckInDate());
         model.addAttribute("checkoutDate",time.getCheckoutDate());
