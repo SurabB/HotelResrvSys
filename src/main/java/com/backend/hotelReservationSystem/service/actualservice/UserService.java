@@ -45,22 +45,7 @@ public class UserService {
     private final ReservationRepo reservationRepo;
 
     public Page<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime, PageSortReceiver pageSortReceiver){
-        String sortDir = pageSortReceiver.getSortDir();
-        Pageable pageable;
-        if(SortingFields.BOOK_ROOM.contains(pageSortReceiver.getSortField())&&(
-                sortDir.equalsIgnoreCase("asc")||
-                        sortDir.equalsIgnoreCase("desc")
-                )
-        ){
-            Sort sort;
-            if(sortDir.equalsIgnoreCase("asc")){
-                sort=Sort.by(pageSortReceiver.getSortField()).ascending();
-            }
-            else  sort=Sort.by(pageSortReceiver.getSortField()).descending();
-
-            pageable = PageRequest.of(pageSortReceiver.getPageNo()-1, PaginationReceiver.PAGE_SIZE,sort);
-        }
-        else pageable = PageRequest.of(pageSortReceiver.getPageNo()-1, PaginationReceiver.PAGE_SIZE);
+        Pageable pageable = SortingFields.getPageableObj(pageSortReceiver,SortingFields.BOOK_ROOM);
         return roomRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,pageable);
 
     }
@@ -111,13 +96,13 @@ public class UserService {
         return businessRepo.findBusiness(findbusinessdto.getBusinessName(),findbusinessdto.getCity(),findbusinessdto.getLocation());
     }
 
-    public Page<Business> findAllAvailableBusinesses(Integer pageNo) {
-        Pageable pageRequest = PageRequest.of(pageNo-1, PaginationReceiver.PAGE_SIZE);
+    public Page<Business> findAllAvailableBusinesses(PageSortReceiver pageSortReceiver) {
+        Pageable pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.DISPLAY_BUSINESS);
         return businessRepo.findAvailableBusiness(pageRequest);
     }
 
-    public Page<ReservationTable> findBookingsOfParticularUser(String name, Long businessId,Integer pageNo) {
-        Pageable pageRequest = PageRequest.of(pageNo - 1, PaginationReceiver.PAGE_SIZE);
+    public Page<ReservationTable> findBookingsOfParticularUser(String name, Long businessId,PageSortReceiver pageSortReceiver) {
+        Pageable pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.CANCEL_BOOKING);
         Page<ReservationTable> bookingsOfParticularUser = reservationRepo.findBookingsOfParticularUser(name, businessId, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
         return bookingsOfParticularUser;
 

@@ -1,5 +1,6 @@
 package com.backend.hotelReservationSystem.controller.regLoginController;
 
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
 import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.adminDto.UserReceiverDto;
 import com.backend.hotelReservationSystem.dto.commonDto.EmailDto;
@@ -55,18 +56,21 @@ public class AdminController {
 
     }
     @GetMapping("/adminApprove")
-    public String adminApprove(@RequestParam(name = "pageNo",defaultValue = "1") Integer pageNo,Model model,RedirectAttributes redirectAttributes) {
+    public String adminApprove(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/admin/resource/dashboard",bindingResult);
+        }
         //fetches all unapproved (adminApproval->false) users from db  for possible admin approval
-        Page<User> unApprovedUsersPageFromDb = tokenService.getAllUnapprovedUsers(pageNo);
+        Page<User> unApprovedUsersPageFromDb = tokenService.getAllUnapprovedUsers(pageSortReceiver);
         int totalPages=unApprovedUsersPageFromDb.getTotalPages();
 
         //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
-        if(totalPages>0&& totalPages<pageNo){
+        if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
             redirectAttributes.addAttribute("pageNo",totalPages);
             return "redirect:/admin/resource/adminApprove";
         }
         List<UserReceiverDto> allUnapprovedUsers = unApprovedUsersPageFromDb.stream().map(user -> new UserReceiverDto(user.getEmail(), user.getRole().toString())).toList();
-        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
+        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
         model.addAttribute("paginationReceiver",paginationReceiver);
         model.addAttribute("allUnapprovedUsers", allUnapprovedUsers);
         return "adminService/approveUsersGet";
@@ -94,17 +98,20 @@ public class AdminController {
     }
     @GetMapping("/adminDisprove")
     @Validated
-    public String adminDisprove(@Positive(message = "Provide page no greater than zero") @RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo, Model model, RedirectAttributes redirectAttributes) {
+    public String adminDisprove(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/admin/resource/dashboard",bindingResult);
+        }
 try {
     // fetches all approved(adminApproved->true) users from db for possible blocking of user
-    Page<User> approvedUsersPageFromDb = tokenService.getAllApprovedUsers(pageNo);
+    Page<User> approvedUsersPageFromDb = tokenService.getAllApprovedUsers(pageSortReceiver);
     int totalPages=approvedUsersPageFromDb.getTotalPages();
     //if user passes invalid pageNo(in this case ,it will always be greater than totalPages), redirect to last page.
-    if(totalPages>0&& totalPages<pageNo){
+    if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
         redirectAttributes.addAttribute("pageNo",totalPages);
         return "redirect:/admin/resource/adminDisprove";
     }
-    PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
+    PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
     model.addAttribute("approvedUsers", approvedUsersPageFromDb.toList());
     model.addAttribute("paginationReceiver",paginationReceiver);
     return "adminService/disapproveUserGet";

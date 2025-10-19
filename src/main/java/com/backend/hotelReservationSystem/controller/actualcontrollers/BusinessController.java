@@ -1,5 +1,6 @@
 package com.backend.hotelReservationSystem.controller.actualcontrollers;
 
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
 import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -94,15 +96,18 @@ public class BusinessController {
     }
 
     @GetMapping("/changeRoomInfo")
-    public String changeRoomInfo(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo,RedirectAttributes redirectAttributes, Principal principal, Model model){
-        Page<Room> allRooms = businessService.findRoomByBusinessEmail(principal.getName(),pageNo);
+    public String changeRoomInfo(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,BindingResult bindingResult, RedirectAttributes redirectAttributes, Principal principal, Model model){
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/business/resource/dashboard",bindingResult);
+        }
+        Page<Room> allRooms = businessService.findRoomByBusinessEmail(principal.getName(),pageSortReceiver);
         int totalPages=allRooms.getTotalPages();
         //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
-        if(totalPages>0&& totalPages<pageNo){
+        if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
             redirectAttributes.addAttribute("pageNo",totalPages);
             return "redirect:/business/service/changeRoomInfo";
         }
-        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
+        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
         model.addAttribute("paginationReceiver",paginationReceiver);
         model.addAttribute("allRooms",allRooms.toList());
         return "businessService/changeRoomInfo";
@@ -131,18 +136,28 @@ public class BusinessController {
 
     }
     @GetMapping("/findBookedRooms")
-    public String findBookedRooms(@RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo,
+    public String findBookedRooms(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,
+                                  BindingResult bindingResult,
                                   RedirectAttributes redirectAttributes,
                                   Principal principal, Model model){
-        Page<ReservationTable> bookedRoomsPage = businessService.findBookedRooms(principal.getName(),pageNo);
+        if (bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/business/resource/dashboard",bindingResult);
+        }
+        Page<ReservationTable> bookedRoomsPage = businessService.findBookedRooms(principal.getName(), pageSortReceiver);
         int totalPages=bookedRoomsPage.getTotalPages();
         //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
-        if(totalPages>0&& totalPages<pageNo){
+        if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
             redirectAttributes.addAttribute("pageNo",totalPages);
             return "redirect:/business/service/findBookedRooms";
         }
-        Map<ReservationTable,Room >bookedRooms = bookedRoomsPage.stream().collect(Collectors.toMap(Function.identity(), reservationTable -> reservationTable.getRoom()));
-        PaginationReceiver paginationReceiver = new PaginationReceiver(bookedRoomsPage.getTotalPages(), pageNo);
+        Map<ReservationTable,Room >bookedRooms = bookedRoomsPage.stream()
+                .collect(Collectors
+                        .toMap(Function.identity(),
+                                reservationTable -> reservationTable.getRoom(),
+                                (x,y)->{throw new IllegalStateException("duplicates reservation");},
+                                LinkedHashMap::new
+                        ));
+        PaginationReceiver paginationReceiver = new PaginationReceiver(bookedRoomsPage.getTotalPages(), pageSortReceiver.getPageNo());
         model.addAttribute("paginationReceiver",paginationReceiver);
         model.addAttribute("bookedRooms",bookedRooms);
         return  "businessService/bookedRooms";

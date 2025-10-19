@@ -16,9 +16,30 @@
     <thead>
     <tr>
         <th>SNo</th>
-        <th>Hotel Name</th>
-        <th>City</th>
-        <th>Location</th>
+        <th>Hotel Name
+            <form th:action="@{/user/service/getBusiness}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="businessName">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>City
+            <form th:action="@{/user/service/getBusiness}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="cityName">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Location
+            <form th:action="@{/user/service/getBusiness}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="location">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
         <th>Select Hotels</th>
     </tr>
     </thead>

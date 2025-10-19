@@ -16,10 +16,38 @@
     <thead>
     <tr>
         <th>SNo</th>
-        <th>RoomNo</th>
-        <th>PricePerHour</th>
-        <th>Room Type</th>
-        <th>Room Status</th>
+        <th>RoomNo
+            <form th:action="@{/business/service/changeRoomInfo}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="roomNumber">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>PricePerHour
+            <form th:action="@{/business/service/changeRoomInfo}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="pricePerHour">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Room Type
+            <form th:action="@{/business/service/changeRoomInfo}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="roomType">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Room Status
+            <form th:action="@{/business/service/changeRoomInfo}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="roomIsActive">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
         <th> Change Status</th>
         <th>Change Room Info</th>
     </tr>

@@ -17,8 +17,22 @@
     <thead>
     <tr>
         <th>SNo</th>
-        <th>email</th>
-        <th>Role</th>
+        <th>email
+            <form th:action="@{/admin/resource/adminDisprove}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="email">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Role
+            <form th:action="@{/admin/resource/adminDisprove}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="role">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
         <th>Disapprove</th>
     </tr>
     </thead>

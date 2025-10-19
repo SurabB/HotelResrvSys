@@ -25,12 +25,47 @@
     <tr>
         <th>SNo</th>
         <th>Room No</th>
-        <th>Booking Date</th>
-        <th>Check In Date</th>
-        <th>Checkout Date</th>
-        <th>Status</th>
+        <th>Booking Date
+            <form th:action="@{/user/service/cancelBooking}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="bookingDate">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Check In Date
+            <form th:action="@{/user/service/cancelBooking}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="checkInDate">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Checkout Date
+            <form th:action="@{/user/service/cancelBooking}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="checkoutDate">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Status
+            <form th:action="@{/user/service/cancelBooking}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="status">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
         <th>Room Type</th>
-        <th> Amount paid for Booking Room</th>
+        <th> Amount paid for Booking Room
+            <form th:action="@{/user/service/cancelBooking}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="paymentAmt">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
         <th>Penalty Amt(5% of paid amt) </th>
         <th> Expected amount you will get(if cancelled now)</th>
         <th>Cancel Booking</th>

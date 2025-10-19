@@ -18,14 +18,56 @@
         <th>SNo</th>
         <th>RoomNo</th>
         <th>Present PricePerHour</th>
-        <th>Booked PricePerHour</th>
+        <th>Booked PricePerHour
+            <form th:action="@{/business/service/findBookedRooms}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="pricePerHr">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
         <th>Room Type</th>
-        <th>Room status</th>
+        <th>Room status
+            <form th:action="@{/business/service/findBookedRooms}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="status">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
         <th>Active Status</th>
-        <th>Booking Date</th>
-        <th>CheckIng Date</th>
-        <th>Checked Out Date</th>
-        <th>Paid amount</th>
+        <th>Booking Date
+            <form th:action="@{/business/service/findBookedRooms}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="bookingDate">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>CheckIng Date
+            <form th:action="@{/business/service/findBookedRooms}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="checkInDate">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Checked Out Date
+            <form th:action="@{/business/service/findBookedRooms}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="checkoutDate">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Paid amount
+            <form th:action="@{/business/service/findBookedRooms}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="paymentAmt">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
     </tr>
     </thead>
 

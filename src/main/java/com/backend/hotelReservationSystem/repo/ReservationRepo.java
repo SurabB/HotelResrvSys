@@ -5,6 +5,7 @@ import com.backend.hotelReservationSystem.entity.ReservationTable;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,7 +17,8 @@ import java.util.Optional;
 @Transactional
 public interface ReservationRepo extends JpaRepository<ReservationTable,Long> {
 
-@Query("select rt from ReservationTable rt join rt.user u  join fetch  rt.room r join r.business b where u.email=:userEmail and b.businessId=:businessId and (rt.status=:booked or rt.status=:checkedIn) and rt.checkoutDate>now")
+   @EntityGraph(attributePaths = "room")
+@Query("select rt from ReservationTable rt join rt.user u join rt.room r join r.business b where u.email=:userEmail and b.businessId=:businessId and (rt.status=:booked or rt.status=:checkedIn) and rt.checkoutDate>now")
 Page<ReservationTable> findBookingsOfParticularUser(String userEmail, Long businessId, ReservationStatus booked, ReservationStatus checkedIn,LocalDateTime now, Pageable pageable);
 
 @Query("select rt from ReservationTable rt join fetch rt.room r join rt.user u join r.business b where b.businessId=:businessId and r.roomNumber=:roomNo and u.email=:userEmail and b.user.isActive=true and rt.status=:booked and rt.checkInDate=:checkInDate and rt.checkoutDate=:checkoutDate")
@@ -28,6 +30,7 @@ Page<ReservationTable> findBookingsOfParticularUser(String userEmail, Long busin
     @Query("select rt from ReservationTable rt join fetch rt.user u join fetch rt.room r join fetch r.business b where rt.status not in (:checkedIn ,:booked)")
     List<ReservationTable> findRoomsWithStatusExceptCheckedInAndBooked(ReservationStatus checkedIn, ReservationStatus booked);
 
-    @Query("select rt from ReservationTable rt join fetch rt.room r where r.business.user.email = :businessEmail and (rt.status = :booked or rt.status = :checkedIn) and rt.checkoutDate>now")
+    @EntityGraph(attributePaths = "room")
+    @Query("select rt from ReservationTable rt join  rt.room r where r.business.user.email = :businessEmail and (rt.status = :booked or rt.status = :checkedIn) and rt.checkoutDate>now")
     Page<ReservationTable> findBookedReservationAndRooms(String businessEmail, ReservationStatus booked, ReservationStatus checkedIn,LocalDateTime now, Pageable pageable);
 }

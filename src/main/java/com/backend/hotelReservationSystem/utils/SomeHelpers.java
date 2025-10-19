@@ -5,6 +5,7 @@ import com.backend.hotelReservationSystem.entity.ReservationTable;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -23,6 +24,10 @@ public class SomeHelpers {
                                     Duration duration = Duration.between(booking.getCheckInDate(), booking.getCheckoutDate());
                                     return BookingCancellationPolicy.calculateCancellationPrice(duration, booking.getPricePerHr());
                                 }
-                        ));
+                                ,(x,y)-> {
+                                    throw new IllegalStateException("duplicates reservations");
+                                },LinkedHashMap::new)
+                        );
+
     }
 }

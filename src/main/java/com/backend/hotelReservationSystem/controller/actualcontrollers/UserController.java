@@ -41,21 +41,24 @@ public class UserController {
 
 //  get all available(active) businesses for selection
     @GetMapping("/getBusiness")
-    public String getBusiness(@RequestParam(value = "pageNo",defaultValue = "1")Integer pageNo,@SessionAttribute(value = "business",required = false)Business business, Model model, RedirectAttributes redirectAttributes) {
+    public String getBusiness(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,BindingResult bindingResult,@SessionAttribute(value = "business",required = false)Business business, Model model, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/user/resource/dashboard",bindingResult);
+        }
         if(business!=null){
             redirectAttributes.addFlashAttribute("failure","You need to first logout from Business");
             return "redirect:/user/service/businessPage";
         }
         try {
             //gets all businesses which are active from db.
-            Page<Business> allAvailableBusinesses = userService.findAllAvailableBusinesses(pageNo);
+            Page<Business> allAvailableBusinesses = userService.findAllAvailableBusinesses(pageSortReceiver);
             int totalPages=allAvailableBusinesses.getTotalPages();
             //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
-            if(totalPages>0&& totalPages<pageNo){
+            if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
                 redirectAttributes.addAttribute("pageNo",totalPages);
                 return "redirect:/user/service/getBusiness";
             }
-            PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
+            PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
             model.addAttribute("paginationReceiver",paginationReceiver);
             model.addAttribute("allAvailableBusinesses", allAvailableBusinesses.toList());
             return "userService/displayAllAvailableBusinesses";
@@ -218,21 +221,25 @@ catch (Exception e) {
     }
     //fetches particular user booking and send it to the user
     @GetMapping("/cancelBooking")
-    public String cancelBooking(@RequestParam(value = "pageNo",defaultValue = "1")Integer pageNo,@SessionAttribute(value = "business",required = false) Business business,Model model,Principal principal,RedirectAttributes redirectAttributes) {
+    public String cancelBooking(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,BindingResult bindingResult,@SessionAttribute(value = "business",required = false) Business business,Model model,Principal principal,RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            redirectAttributes.addFlashAttribute("failure","Invalid credentials Provided");
+            return "redirect:/user/service/businessPage";
+        }
         if(business==null) {
             redirectAttributes.addFlashAttribute("failure", "Select Business to continue");
             return "redirect:/user/service/getBusiness";
         }
         try {
-            Page<ReservationTable> bookingsAndRefundableAmtpage = userService.findBookingsOfParticularUser(principal.getName(), business.getBusinessId(),pageNo);
+            Page<ReservationTable> bookingsAndRefundableAmtpage = userService.findBookingsOfParticularUser(principal.getName(), business.getBusinessId(),pageSortReceiver);
             int totalPages=bookingsAndRefundableAmtpage.getTotalPages();
             //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
-            if(totalPages>0&& totalPages<pageNo){
+            if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
                 redirectAttributes.addAttribute("pageNo",totalPages);
                 return "redirect:/user/service/cancelBooking";
             }
             Map<ReservationTable, BigDecimal> bookingsAndRefundableAmt = SomeHelpers.convertToMap(bookingsAndRefundableAmtpage.toList());
-            PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageNo);
+            PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
             model.addAttribute("bookingsAndRefundableAmt", bookingsAndRefundableAmt);
             model.addAttribute("paginationReceiver",paginationReceiver);
             return "userService/cancelBookings";
