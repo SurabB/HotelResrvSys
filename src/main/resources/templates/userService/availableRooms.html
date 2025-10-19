@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Show available Rooms</title>
-    <link rel="stylesheet" th:href="@{/css/table.css}" href="../../../css/table.css"/>
+    <link rel="stylesheet" th:href="@{/css/table.css}"/>
 
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
 </head>
@@ -12,13 +12,32 @@
 <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
-<p th:if="${availableRooms.size() > 0}" th:text="|CheckInTime time-Checkout Time:${checkInDate}-${checkoutDate}|"></p>
+<p th:if="${availableRooms.size() > 0}" style="color:dodgerblue; font-weight:bolder;" th:text="|CheckInTime time - Checkout Time:${checkInDate} to ${checkoutDate}|"></p>
 <table th:if="${availableRooms.size() > 0}">
         <tr>
             <th>SNo</th>
             <th>RoomNo</th>
-            <th>Room Type</th>
-            <th>Price per Hour</th>
+            <th>Room Type
+                <form th:action="@{/user/service/bookRoom}" method="get">
+                <input type="hidden" name="checkInDate" th:value="${checkInDate}">
+                <input type="hidden" name="checkoutDate" th:value="${checkoutDate}">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="roomType">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+                </form>
+
+            </th>
+            <th>Price per Hour
+                <form th:action="@{/user/service/bookRoom}" method="get">
+                <input type="hidden" name="checkInDate" th:value="${checkInDate}">
+                <input type="hidden" name="checkoutDate" th:value="${checkoutDate}">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="pricePerHour">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+                </form>
+            </th>
             <th>Total Price</th>
             <th>Book Room</th>
         </tr>
@@ -36,6 +55,9 @@
                     <input type="hidden" name="roomNumber" th:value="${room.key.roomNumber}">
                     <input type="hidden" name="checkInTime" th:value="${checkInDate}">
                     <input type="hidden" name="checkoutTime" th:value="${checkoutDate}">
+                    <input type="hidden" name="userProvidePrice" th:value="${room.value}">
+                    <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+
 
                     <button type="submit" onclick="return confirm('Do you really want to Book room');">Book</button>
                 </form>
@@ -45,6 +67,41 @@
 
 
 </table>
+<div th:if="${availableRooms.size()>0}"><!-- Previous -->
+    <span th:if="${!paginationReceiver.isFirst(paginationReceiver.pageNo)}">
+    <a  th:href="@{/user/service/bookRoom(
+    pageNo=${paginationReceiver.pageNo - 1},
+    checkInDate=${checkInDate},
+      checkoutDate=${checkoutDate}
+    )}">
+      Previous
+    </a>
+  </span>
+
+    <!-- Page Numbers -->
+    <span th:each="index : ${paginationReceiver.indexes()}">
+  <a th:href="@{/user/service/bookRoom(
+      pageNo=${index},
+      checkInDate=${checkInDate},
+      checkoutDate=${checkoutDate}
+)}"
+     th:text="${index}"
+     th:classappend="${index == paginationReceiver.pageNo} ? 'active-Page' : ''">
+</a>
+  </span>
+
+    <!-- Next -->
+    <span th:if="${!paginationReceiver.isLast(paginationReceiver.pageNo)}">
+    <a th:href="@{/user/service/bookRoom(
+       pageNo=${paginationReceiver.pageNo + 1},
+       checkInDate=${checkInDate},
+      checkoutDate=${checkoutDate}
+       )}">
+      Next
+    </a>
+  </span>
+
+</div>
 <br>
 <a th:href="@{/user/service/businessPage}">Back</a>
 <br>

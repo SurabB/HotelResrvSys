@@ -6,7 +6,17 @@
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
-
+<style>
+    input {
+        display: inline-block;
+        margin: 10px 0;
+        padding: 10px 15px;
+        color: #fff;
+        background-color: #037bfd;
+        border-radius: 5px;
+        transition: background-color 0.2s ease;
+    }
+</style>
 </head>
 <body>
 <h1 th:text="|Welcome to Hotel ${business.businessName}|"></h1>
@@ -15,16 +25,17 @@
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
 <br>
-<a th:href="@{/user/service/getRoom}" target="_blank" rel="noopener noreferrer">
+<a th:href="@{/user/service/getRoom}">
     Book Room
 </a>
 <br>
-<a th:href="@{/user/service/cancelBooking}" target="_blank" rel="noopener noreferrer">Cancel Booking</a>
+<a th:href="@{/user/service/cancelBooking}">Cancel Booking</a>
 
-<br>
-<a th:href="@{/user/resource/dashboard}">Back</a>
-<br>
-<a th:href="@{/user/service/logout}">Logout from business</a>
+
+<form th:action="@{/user/service/logout}" method="post">
+    <input type="submit" id="businessLogout" value="Logout"/>
+</form>
+
 
 
 </body>

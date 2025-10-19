@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagination Fragment</title>
+  <style>
+    .active-Page{
+      color:blue;
+    }
+
+  </style>
+</head>
+<body>
+<div th:fragment="paginationDisplay(url, paginationReceiver)">
+
+   <span th:if="${!paginationReceiver.isFirst(paginationReceiver.pageNo)}">
+    <a th:href="@{${url}(pageNo=${paginationReceiver.pageNo-1})}">
+      Previous
+    </a>
+  </span>
+
+  <!-- Page Numbers -->
+  <span th:each="index : ${paginationReceiver.indexes()}">
+<a th:href="@{${url}(pageNo=${index})}"
+   th:text="${index}"
+   th:classappend="${index == paginationReceiver.pageNo} ? 'active-Page' : ''">
+</a>
+  </span>
+
+  <!-- Next -->
+  <span th:if="${!paginationReceiver.isLast(paginationReceiver.pageNo)}">
+    <a th:href="@{${url}(pageNo=${paginationReceiver.pageNo+1})}">
+      Next
+    </a>
+  </span>
+</div>
+
+
+</body>
+</html>

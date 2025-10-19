@@ -5,17 +5,6 @@
     <title>Change Room Info</title>
     <link rel="stylesheet" th:href="@{/css/table.css}">
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
-    <style>
-        table {
-
-            border-collapse: collapse;
-        }
-        th, td{
-            border:2px solid black;
-            padding: 24px;
-
-        }
-    </style>
 </head>
 <body>
 
@@ -23,41 +12,86 @@
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
 
-<table th:if="${allAvailableRooms.size() > 0}">
+<table th:if="${allRooms.size() > 0}">
     <thead>
     <tr>
         <th>SNo</th>
-        <th>RoomNo</th>
-        <th>PricePerHour</th>
-        <th>Room Type</th>
-        <th>Active Status</th>
+        <th>RoomNo
+            <form th:action="@{/business/service/changeRoomInfo}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="roomNumber">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>PricePerHour
+            <form th:action="@{/business/service/changeRoomInfo}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="pricePerHour">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Room Type
+            <form th:action="@{/business/service/changeRoomInfo}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="roomType">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Room Status
+            <form th:action="@{/business/service/changeRoomInfo}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="roomIsActive">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th> Change Status</th>
         <th>Change Room Info</th>
     </tr>
     </thead>
 
     <tbody>
-    <tr th:each="room, roomStat : ${allAvailableRooms}">
+    <tr th:each="room, stat : ${allRooms}">
         <form th:action="@{/business/service/changeRoomInfo}" method="post">
-            <td th:text="${roomStat.count}"></td>
-            <td><input name="roomNumber" type="number" th:placeholder="${room.roomNumber}"></td>
-            <td><input name="pricePerHour" type="number" step="0.01" th:placeholder="${room.pricePerHour}"></td>
-            <td><input name="roomType" type="text" th:placeholder="${room.roomType}"></td>
-            <td th:text="${room.roomIsActive}"></td>
+            <td th:text="${stat.count}"></td>
+            <td th:text="${room.roomNumber}"></td>
+
+            <td><input type="number" name="pricePerHour" step="0.01" th:placeholder="${room.pricePerHour}"></td>
+            <td><input type="text" name="roomType" th:placeholder="${room.roomType}"></td>
+            <td th:text="${room.roomIsActive? 'ACTIVE':'INACTIVE'}"></td>
+            <td>
+                <input type="checkbox"
+                       name="roomIsActive"
+                       th:value="${room.roomIsActive}"
+                       th:checked="false" />
+            </td>
+
             <td><button type="submit">Change Room Info</button></td>
-            <input type="hidden" name="activeRoomNumber" th:value="${room.roomNumber}"/>
+
+            <input type="hidden" name="activeRoomNumber" th:value="${room.roomNumber}">
+            <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
 
         </form>
-
     </tr>
 
-
     </tbody>
-
 </table>
+<th:block th:if="${allRooms.size()>0}">
+
+    <th:block
+            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/business/service/changeRoomInfo},${paginationReceiver})}">
+
+    </th:block>
+</th:block>
 <br>
 <a th:href="@{/business/resource/dashboard}">Back</a>
 <br>
 
-<h1 th:if="${allAvailableRooms.size()==0}" style="color: red;">All rooms are booked. Cant change Room information </h1>
+<h1 th:if="${allRooms.size() == 0}" style="color: red;">
+    All rooms are booked. Can't change Room information
+</h1>
 </body>
 </html>

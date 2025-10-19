@@ -46,10 +46,11 @@ public class UserRegController {
 
 @PreAuthorize("hasRole('USER')")
     @GetMapping("/dashboard")
-    public String dashboardPage(@SessionAttribute(value = "business",required = false)Business business, HttpSession session)
+    public String dashboardPage(@SessionAttribute(value = "business",required = false)Business business,RedirectAttributes redirectAttributes)
 {
     if(business!=null){
-        session.removeAttribute("business");
+        redirectAttributes.addFlashAttribute("failure","You need to first logout from Business");
+        return "redirect:/user/service/businessPage";
     }
         return "userService/userDashboard";
     }

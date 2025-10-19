@@ -16,9 +16,30 @@
     <thead>
     <tr>
         <th>SNo</th>
-        <th>Hotel Name</th>
-        <th>City</th>
-        <th>Location</th>
+        <th>Hotel Name
+            <form th:action="@{/user/service/getBusiness}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="businessName">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>City
+            <form th:action="@{/user/service/getBusiness}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="cityName">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
+        <th>Location
+            <form th:action="@{/user/service/getBusiness}" method="get">
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+                <input type="hidden" name="sortField" value="location">
+                <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+                <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+            </form>
+        </th>
         <th>Select Hotels</th>
     </tr>
     </thead>
@@ -33,12 +54,21 @@
                 <input type="hidden" name="city" th:value="${business.cityName}" />
                 <input type="hidden" name="location" th:value="${business.location}" />
                 <input type="hidden" name="businessName" th:value="${business.businessName}" />
+                <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+
                 <button type="submit">select</button>
             </form>
         </td>
     </tr>
     </tbody>
 </table>
+<th:block th:if="${allAvailableBusinesses.size()>0}">
+
+    <th:block
+            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/user/service/getBusiness},${paginationReceiver})}">
+
+    </th:block>
+</th:block>
 <br>
 <a th:href="@{/user/resource/dashboard}">Back</a>
 <br>

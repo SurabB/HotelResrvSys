@@ -1,5 +1,7 @@
 package com.backend.hotelReservationSystem.controller.regLoginController;
 
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.adminDto.UserReceiverDto;
 import com.backend.hotelReservationSystem.dto.commonDto.EmailDto;
 import com.backend.hotelReservationSystem.enums.Role;
@@ -10,11 +12,14 @@ import com.backend.hotelReservationSystem.service.regServ.InvalidateSession;
 import com.backend.hotelReservationSystem.service.regServ.RegistrationService;
 import com.backend.hotelReservationSystem.service.regServ.TokenService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -51,19 +56,33 @@ public class AdminController {
 
     }
     @GetMapping("/adminApprove")
-    public String adminApprove(Model model) {
+    public String adminApprove(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/admin/resource/dashboard",bindingResult);
+        }
         //fetches all unapproved (adminApproval->false) users from db  for possible admin approval
-        List<User> unApprovedUsersFromDb = tokenService.getAllUnapprovedUsers();
-        List<UserReceiverDto> allUnapprovedUsers = unApprovedUsersFromDb.stream().map(user -> new UserReceiverDto(user.getEmail(), user.getRole().toString())).toList();
+        Page<User> unApprovedUsersPageFromDb = tokenService.getAllUnapprovedUsers(pageSortReceiver);
+        int totalPages=unApprovedUsersPageFromDb.getTotalPages();
+
+        //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
+        if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
+            redirectAttributes.addAttribute("pageNo",totalPages);
+            return "redirect:/admin/resource/adminApprove";
+        }
+        List<UserReceiverDto> allUnapprovedUsers = unApprovedUsersPageFromDb.stream().map(user -> new UserReceiverDto(user.getEmail(), user.getRole().toString())).toList();
+        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
+        model.addAttribute("paginationReceiver",paginationReceiver);
         model.addAttribute("allUnapprovedUsers", allUnapprovedUsers);
         return "adminService/approveUsersGet";
     }
 
     @PostMapping("/adminApprove")
-    public String adminApprove(@Valid @ModelAttribute EmailDto emailDto, RedirectAttributes redirectAttributes, BindingResult bindingResult) {
+    public String adminApprove(@Valid @ModelAttribute EmailDto emailDto,BindingResult bindingResult,@RequestParam(name = "pageNo",defaultValue = "1") Integer pageNo,RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()){
             throw new CustomMethodArgFailedException("redirect:/admin/resource/adminApprove",bindingResult);
         }
+        //redirects to the pageNo(if possible) where user hit this request
+        redirectAttributes.addAttribute("pageNo",pageNo);
         try {
             //attempts to approve a particular user based on their email
             boolean approved = tokenService.adminApproval(emailDto.getEmail());
@@ -78,25 +97,37 @@ public class AdminController {
 
     }
     @GetMapping("/adminDisprove")
-    public String adminDisprove(Model model, RedirectAttributes redirectAttributes) {
+    @Validated
+    public String adminDisprove(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/admin/resource/dashboard",bindingResult);
+        }
 try {
     // fetches all approved(adminApproved->true) users from db for possible blocking of user
-    List<User> approvedUsersFromDb = tokenService.getAllApprovedUsers();
-    List<UserReceiverDto> approvedUsers = approvedUsersFromDb.stream().map(user -> new UserReceiverDto(user.getEmail(), user.getRole().toString())).toList();
-    model.addAttribute("approvedUsers", approvedUsers);
-
+    Page<User> approvedUsersPageFromDb = tokenService.getAllApprovedUsers(pageSortReceiver);
+    int totalPages=approvedUsersPageFromDb.getTotalPages();
+    //if user passes invalid pageNo(in this case ,it will always be greater than totalPages), redirect to last page.
+    if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
+        redirectAttributes.addAttribute("pageNo",totalPages);
+        return "redirect:/admin/resource/adminDisprove";
+    }
+    PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
+    model.addAttribute("approvedUsers", approvedUsersPageFromDb.toList());
+    model.addAttribute("paginationReceiver",paginationReceiver);
     return "adminService/disapproveUserGet";
 }
 catch(Exception e){
-    redirectAttributes.addFlashAttribute("failure","cannot remove admin Approval for the user.Please try again");
+    redirectAttributes.addFlashAttribute("failure","something went wrong");
     return "redirect:/admin/resource/adminApprove";
 }
     }
     @PostMapping("/adminDisprove")
-    public String adminDisprove(@Valid @ModelAttribute EmailDto emailDto, RedirectAttributes redirectAttributes, BindingResult bindingResult) {
+    public String adminDisprove(@Valid @ModelAttribute EmailDto emailDto,BindingResult bindingResult, @RequestParam(value = "pageNo",defaultValue = "1") Integer pageNo, RedirectAttributes redirectAttributes) {
         if(bindingResult.hasErrors()) {
             throw new CustomMethodArgFailedException("redirect:/admin/resource/adminDisprove",bindingResult);
         }
+        //redirects to the pageNo(if possible) where user hit this request
+        redirectAttributes.addAttribute("pageNo",pageNo);
         //attempts to set adminApproved->false in db to block user, based on their email
         try {
             boolean disproved = tokenService.disproveUser(emailDto.getEmail());

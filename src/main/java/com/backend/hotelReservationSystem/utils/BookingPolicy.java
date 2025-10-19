@@ -4,6 +4,7 @@ import com.backend.hotelReservationSystem.dto.userServiceDto.BookRoomDto;
 import com.backend.hotelReservationSystem.exceptionClasses.BookingCancellationException;
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
@@ -70,8 +71,9 @@ public class BookingPolicy {
     }
     @AllArgsConstructor
     @Getter
+    @Setter
     @ToString
-    public static class BookingTime{
+    public static class BookingTime {
         private LocalDateTime checkInDate;
         private LocalDateTime checkoutDate;
     }

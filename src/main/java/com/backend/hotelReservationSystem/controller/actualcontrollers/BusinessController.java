@@ -1,5 +1,7 @@
 package com.backend.hotelReservationSystem.controller.actualcontrollers;
 
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomUpdateDto;
@@ -8,9 +10,9 @@ import com.backend.hotelReservationSystem.entity.Room;
 import com.backend.hotelReservationSystem.exceptionClasses.CustomMethodArgFailedException;
 import com.backend.hotelReservationSystem.service.actualservice.BusinessService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,8 +22,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -90,40 +95,31 @@ public class BusinessController {
 
     }
 
-    @GetMapping("/changeRoomStatus")
-    public String changeRoomStatus(Principal principal, Model model){
-        List<Room> allRooms = businessService.getAllRooms(principal.getName());
-        model.addAttribute("allRooms",allRooms);
-        return "businessService/changeRoomStatus";
-
-    }
-
-    @PostMapping("/changeRoomStatus")
-    @Validated
-    public String changeRoomStatus(@NotNull(message = "room Number should not be blank") @RequestParam("roomNumber") Long roomNumber, Principal principal, RedirectAttributes redirectAttributes){
-        try {
-
-            businessService.changeStatusOfRoom(principal.getName(),roomNumber);
-                redirectAttributes.addFlashAttribute("success", "Room status changed successfully!");
-                return "redirect:/business/service/changeRoomStatus";
-        }
-        catch (Exception ex) {
-            redirectAttributes.addFlashAttribute("failure", "Something went wrong on server side.");
-            return "redirect:/business/service/changeRoomStatus";
-        }
-
-    }
     @GetMapping("/changeRoomInfo")
-    public String changeRoomInfo(Principal principal, Model model){
-        List<Room> allAvailableRooms = businessService.getAllAvailableRooms(principal.getName());
-        model.addAttribute("allAvailableRooms",allAvailableRooms);
+    public String changeRoomInfo(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,BindingResult bindingResult, RedirectAttributes redirectAttributes, Principal principal, Model model){
+        if(bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/business/resource/dashboard",bindingResult);
+        }
+        Page<Room> allRooms = businessService.findRoomByBusinessEmail(principal.getName(),pageSortReceiver);
+        int totalPages=allRooms.getTotalPages();
+        //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
+        if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
+            redirectAttributes.addAttribute("pageNo",totalPages);
+            return "redirect:/business/service/changeRoomInfo";
+        }
+        PaginationReceiver paginationReceiver = new PaginationReceiver(totalPages, pageSortReceiver.getPageNo());
+        model.addAttribute("paginationReceiver",paginationReceiver);
+        model.addAttribute("allRooms",allRooms.toList());
         return "businessService/changeRoomInfo";
     }
     @PostMapping("/changeRoomInfo")
-    public  String changeRoomInfo(@Valid @ModelAttribute RoomUpdateDto roomUpdateDto, BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes){
+    public  String changeRoomInfo(@Valid @ModelAttribute RoomUpdateDto roomUpdateDto, BindingResult bindingResult,
+                                  @RequestParam(value = "pageNo",defaultValue = "1")Integer pageNo,
+                                  Principal principal, RedirectAttributes redirectAttributes){
         if (bindingResult.hasErrors()){
             throw new CustomMethodArgFailedException("redirect:/business/service/changeRoomInfo",bindingResult);
         }
+        redirectAttributes.addAttribute("pageNo",pageNo);
         try {
             boolean changed = businessService.changeRoomInfo(roomUpdateDto, principal.getName());
             if (changed) {
@@ -133,10 +129,6 @@ public class BusinessController {
             redirectAttributes.addFlashAttribute("failure", "invalid credentials.");
             return "redirect:/business/service/changeRoomInfo";
         }
-        catch (DataIntegrityViolationException ex) {
-            redirectAttributes.addFlashAttribute("failure", "Room number already exist for that room. provide different roomNumber.");
-            return "redirect:/business/service/changeRoomInfo";
-        }
         catch (Exception ex) {
             redirectAttributes.addFlashAttribute("failure", "Something went wrong on server side.");
             return "redirect:/business/service/changeRoomInfo";
@@ -144,8 +136,29 @@ public class BusinessController {
 
     }
     @GetMapping("/findBookedRooms")
-    public String findBookedRooms(Principal principal, Model model){
-        Map<Room, ReservationTable> bookedRooms = businessService.findBookedRooms(principal.getName());
+    public String findBookedRooms(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,
+                                  BindingResult bindingResult,
+                                  RedirectAttributes redirectAttributes,
+                                  Principal principal, Model model){
+        if (bindingResult.hasErrors()){
+            throw new CustomMethodArgFailedException("redirect:/business/resource/dashboard",bindingResult);
+        }
+        Page<ReservationTable> bookedRoomsPage = businessService.findBookedRooms(principal.getName(), pageSortReceiver);
+        int totalPages=bookedRoomsPage.getTotalPages();
+        //if user passes invalid pageNo(in this case ,it will always be greater than totalPages) ,redirect to last page.
+        if(totalPages>0&& totalPages<pageSortReceiver.getPageNo()){
+            redirectAttributes.addAttribute("pageNo",totalPages);
+            return "redirect:/business/service/findBookedRooms";
+        }
+        Map<ReservationTable,Room >bookedRooms = bookedRoomsPage.stream()
+                .collect(Collectors
+                        .toMap(Function.identity(),
+                                reservationTable -> reservationTable.getRoom(),
+                                (x,y)->{throw new IllegalStateException("duplicates reservation");},
+                                LinkedHashMap::new
+                        ));
+        PaginationReceiver paginationReceiver = new PaginationReceiver(bookedRoomsPage.getTotalPages(), pageSortReceiver.getPageNo());
+        model.addAttribute("paginationReceiver",paginationReceiver);
         model.addAttribute("bookedRooms",bookedRooms);
         return  "businessService/bookedRooms";
     }

@@ -31,6 +31,9 @@ public class ReservationTable {
     @Column(name="price_per_hr",nullable = false)
     private BigDecimal pricePerHr;
 
+    @Column(nullable = false,name="room_type")
+    private String roomType;
+
    @Enumerated(EnumType.STRING)
    @Column(name = "reservation_status",nullable = false)
    private ReservationStatus status;

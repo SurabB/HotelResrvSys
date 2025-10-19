@@ -1,5 +1,7 @@
 package com.backend.hotelReservationSystem.service.actualservice;
 
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
@@ -14,17 +16,20 @@ import com.backend.hotelReservationSystem.repo.ReservationRepo;
 import com.backend.hotelReservationSystem.repo.RoomRepo;
 import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
+import com.backend.hotelReservationSystem.utils.SortingFields;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 @AllArgsConstructor
@@ -33,6 +38,7 @@ public class BusinessService {
    private final BusinessRepo businessRepo;
    private final RoomRepo roomRepo;
    private final UserRepo userRepo;
+   private final ReservationRepo reservationRepo;
    // if request succeeds, business get added to db
    public void addBusiness(BusinessRegAcceptor businessRegAcceptor,String username){
 
@@ -66,33 +72,14 @@ public class BusinessService {
 
        }
 
-
-
-
-
-
-
-    public void changeStatusOfRoom(String businessEmail,Long roomNumber) {
-
-        int changedStatus = roomRepo.changeActiveStatus(businessEmail,roomNumber);
-        if (changedStatus==0){
-            throw  new StaleUserException("user :"+businessEmail+"is a stale user");
-        }
-
-    }
-
-    public List<Room> getAllRooms(String userEmail) {
-       return roomRepo.getAllRooms(userEmail);
-
-    }
-
-    public List<Room> getAllAvailableRooms(String userEmail) {
-     return roomRepo.findAvailableRoomsByEmail(userEmail, ReservationStatus.BOOKED);
+    public Page<Room> findRoomByBusinessEmail(String userEmail, PageSortReceiver pageSortReceiver) {
+         Pageable pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.CHANGE_ROOM_INFO);
+        return roomRepo.findRoomByBusinessEmail(userEmail, ReservationStatus.BOOKED,pageRequest);
     }
 
     public boolean changeRoomInfo(RoomUpdateDto roomUpdateDto, String businessEmail) {
 //   check if there is a room that has room number associated with business that user wants to change.
-        Optional<Room> particularRoomByBusinessEmail = roomRepo.findParticularRoomByBusinessEmail(roomUpdateDto.getActiveRoomNumber(), businessEmail, ReservationStatus.BOOKED);
+        Optional<Room> particularRoomByBusinessEmail = roomRepo.findParticularRoomByBusinessEmail(roomUpdateDto.getActiveRoomNumber(), businessEmail);
 
         //if no room exist returns false->room has been removed or user passed inaccurate room number
       if(particularRoomByBusinessEmail.isEmpty()){
@@ -102,11 +89,11 @@ public class BusinessService {
       //if exist get the room
         Room room = particularRoomByBusinessEmail.get();
 
-      //get the room number that the user wants to change to.
-        Long userProvideNumber = roomUpdateDto.getRoomNumber();
+      //get the room status that the user wants to change to.
+        Boolean userProvidedStatus = roomUpdateDto.getRoomIsActive();
 
-        if(userProvideNumber!= null&&!userProvideNumber.equals(room.getRoomNumber())&&userProvideNumber>0){
-            room.setRoomNumber(userProvideNumber);
+        if(userProvidedStatus!= null){
+            room.setRoomIsActive(!userProvidedStatus);
       }
 
         //null and empty check for optional field
@@ -124,9 +111,11 @@ public class BusinessService {
       return true;
     }
 
-    public Map<Room,ReservationTable> findBookedRooms(String businessEmail) {
-        List<Room> bookedReservationAndRooms = roomRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED);
-         return bookedReservationAndRooms.stream().collect(Collectors.toMap(room -> room, room -> room.getReservation().getFirst()));
+    public Page<ReservationTable> findBookedRooms(String businessEmail, PageSortReceiver pageSortReceiver) {
+        Pageable  pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.VIEW_BOOKED_ROOMS);
+        return reservationRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
+
+
 
 
     }

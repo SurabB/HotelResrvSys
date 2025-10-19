@@ -1,6 +1,8 @@
 package com.backend.hotelReservationSystem.service.actualservice;
 
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.userServiceDto.CancelBookingDto;
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
 import com.backend.hotelReservationSystem.dto.userServiceDto.RoomBook;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import com.backend.hotelReservationSystem.dto.userServiceDto.FindBusinessDto;
@@ -18,15 +20,19 @@ import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.BookingCancellationPolicy;
 import com.backend.hotelReservationSystem.utils.BookingPolicy;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
+import com.backend.hotelReservationSystem.utils.SortingFields;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,8 +44,9 @@ public class UserService {
     private final RoomRepo roomRepo;
     private final ReservationRepo reservationRepo;
 
-    public List<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime){
-        return roomRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
+    public Page<Room> findAvailableRooms(String businessUuid, BookingPolicy.BookingTime bookingTime, PageSortReceiver pageSortReceiver){
+        Pageable pageable = SortingFields.getPageableObj(pageSortReceiver,SortingFields.BOOK_ROOM);
+        return roomRepo.findAvailableRoomsByUuid(businessUuid,bookingTime.getCheckInDate(),bookingTime.getCheckoutDate(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,pageable);
 
     }
 
@@ -52,14 +59,16 @@ public class UserService {
 //        // 1. find the room
         Room room = roomRepo.findRoomExistence(businessId, bookRoomDto.getRoomNumber(), bookRoomDto.getCheckInTime(),bookRoomDto.getCheckoutTime(),ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN)
                 .orElseThrow(() -> new RoomNotFoundException("Room not found or already rented or not available for renting"));
-//
+
 //        2. calculate total price
 
         BigDecimal totalPrice = BookingPolicy.roomPrizeForDuration(
                 bookRoomDto.getCheckInTime(),bookRoomDto.getCheckoutTime(),room.getPricePerHour())
                 .orElseThrow(() -> new BookingCancellationException("Invalid duration provided for booking"));
 
-
+        if(!(totalPrice.compareTo(bookRoomDto.getUserProvidePrice().setScale(2, RoundingMode.HALF_UP)) ==0)){
+            throw new BookingCancellationException("Provided amount does not match the price provided for booking. Expected price:"+totalPrice+" ,user provided price"+bookRoomDto.getUserProvidePrice());
+        }
 //
 //
 //        // 4. deduct user balance
@@ -87,35 +96,32 @@ public class UserService {
         return businessRepo.findBusiness(findbusinessdto.getBusinessName(),findbusinessdto.getCity(),findbusinessdto.getLocation());
     }
 
-    public List<Business> findAllAvailableBusinesses() {
-        return businessRepo.findAvailableBusiness();
+    public Page<Business> findAllAvailableBusinesses(PageSortReceiver pageSortReceiver) {
+        Pageable pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.DISPLAY_BUSINESS);
+        return businessRepo.findAvailableBusiness(pageRequest);
     }
 
-    public HashMap<ReservationTable,BigDecimal> findBookingsOfParticularUser(String name, Long businessId) {
-        List<ReservationTable> bookingsOfParticularUser = reservationRepo.findBookingsOfParticularUser(name, businessId, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
-        HashMap<ReservationTable,BigDecimal> map=new HashMap<>();
-         bookingsOfParticularUser.forEach(booking -> {
-                    Duration duration = Duration.between(booking.getCheckInDate(), booking.getCheckoutDate());
-                    BigDecimal pricePerHour = booking.getPricePerHr();
-                    BigDecimal refundableAmt = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
-                    map.put(booking,refundableAmt);
-                }
-        );
-         return map;
+    public Page<ReservationTable> findBookingsOfParticularUser(String name, Long businessId,PageSortReceiver pageSortReceiver) {
+        Pageable pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.CANCEL_BOOKING);
+        Page<ReservationTable> bookingsOfParticularUser = reservationRepo.findBookingsOfParticularUser(name, businessId, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
+        return bookingsOfParticularUser;
+
+
 
     }
+
 
     public void cancelBooking(CancelBookingDto
             roomBookingCancel, String userEmail, Long businessId) {
         Optional<ReservationTable> bookedRoomOfParticularUser = reservationRepo.findBookedRoomOfParticularUser(roomBookingCancel.getRoomNumber(),roomBookingCancel.getCheckInTime(),roomBookingCancel.getCheckoutTime(), userEmail, businessId, ReservationStatus.BOOKED);
-        ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Booking Cancellation failed either due to no active booking or user is already checked in or due to invalid credentials "));
-         if(reservationTable.getCheckInDate().minusMinutes(5).isBefore(LocalDateTime.now())){
-             throw new BookingCancellationException("Cannot cancel Booking after checkIn or five minutes before checkIn");
+        ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Booking Cancellation failed either due to no active booking or due to invalid credentials "));
+         if(!reservationTable.getCheckInDate().isAfter(LocalDateTime.now())){
+             throw new BookingCancellationException("Cannot cancel Bookings after checkedIn time");
          }
+
         BigDecimal pricePerHour = reservationTable.getPricePerHr();
         BigDecimal userPaidAmt = reservationTable.getPaymentAmt();
         Duration duration = Duration.between(reservationTable.getCheckInDate(), reservationTable.getCheckoutDate());
-
         BigDecimal priceToReturn = BookingCancellationPolicy.calculateCancellationPrice(duration, pricePerHour);
         int userSuccess = userRepo.addUserBalance(priceToReturn, userEmail);
         int businessSuccess = userRepo.deductBusinessBalance(businessId, priceToReturn);
@@ -130,5 +136,16 @@ public class UserService {
         reservationTable.setPaymentAmt(userPaidAmt.subtract(priceToReturn));
         reservationRepo.save(reservationTable);
 
+    }
+    public boolean earlyCheckout(CancelBookingDto earlyCheckout,String userEmail,Long businessId){
+        Optional<ReservationTable> bookedRoomOfParticularUser = reservationRepo.findBookedRoomOfParticularUser(earlyCheckout.getRoomNumber(),earlyCheckout.getCheckInTime(),earlyCheckout.getCheckoutTime(), userEmail, businessId, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN);
+        ReservationTable reservationTable = bookedRoomOfParticularUser.orElseThrow(() -> new BookingCancellationException("Early Checkout failed either due to no active booking or due to invalid credentials "));
+        if(!reservationTable.getCheckInDate().isAfter(LocalDateTime.now())&&!reservationTable.getCheckoutDate().isBefore(LocalDateTime.now())){
+            reservationTable.setStatus(ReservationStatus.EARLY_CHECKED_OUT);
+            reservationTable.setCheckoutDate(LocalDateTime.now());
+            reservationRepo.save(reservationTable);
+            return true;
+        }
+        return false;
     }
 }

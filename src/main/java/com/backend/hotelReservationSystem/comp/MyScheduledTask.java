@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.List;
 @Slf4j
@@ -22,22 +23,20 @@ public class MyScheduledTask {
 
     @Transactional
     //@Scheduled(fixedDelay = 60000)
-    @Scheduled(cron = "0 00 12 * * *")
+    //@Scheduled(cron = "0 00 12 * * *")
     public void runDailyTask() {
-        try {
-            List<ReservationTable> cancelledAndCheckedOutRooms = reservationRepo.findRoomsWithStatusCheckoutAndCancelled(ReservationStatus.CHECKED_OUT, ReservationStatus.CANCELLED);
+
+            List<ReservationTable> cancelledAndCheckedOutRooms = reservationRepo.findRoomsWithStatusExceptCheckedInAndBooked(ReservationStatus.CHECKED_IN, ReservationStatus.BOOKED);
             List<ReservationHistory> reservationHistory = cancelledAndCheckedOutRooms.stream().map(reservationTable -> CustomBuilder.createReservationHistoryObj(reservationTable)).toList();
             if(!cancelledAndCheckedOutRooms.isEmpty()) {
                 log.info("Fetched {} reservations, saving {} history entries", cancelledAndCheckedOutRooms.size(), reservationHistory.size());
                 reservationHistoryRepo.saveAll(reservationHistory);
-                reservationRepo.deleteAll(()->cancelledAndCheckedOutRooms.iterator());
+                reservationRepo.deleteAll(cancelledAndCheckedOutRooms);
             }
             else {
                 log.info("No reservations Today");
             }
-        }
-        catch (Exception e) {
-            log.error("error occurred while saving reservation history ,error:{}", e.getMessage());
-        }
+
+
     }
 }
