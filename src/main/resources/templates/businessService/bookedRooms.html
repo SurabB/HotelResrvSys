@@ -98,7 +98,7 @@
 <th:block th:if="${bookedRooms.size()>0}">
 
     <th:block
-            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/business/service/findBookedRooms},${paginationReceiver})}">
+            th:replace="~{fragments/paginationDisplay::paginationDisplay(@{/business/service/findBookedRooms},${paginationReceiver})}">
 
     </th:block>
 </th:block>

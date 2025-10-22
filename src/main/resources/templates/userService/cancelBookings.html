@@ -108,7 +108,7 @@
 <th:block th:if="${bookingsAndRefundableAmt.size()>0}">
 
     <th:block
-            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/user/service/cancelBooking},${paginationReceiver})}">
+            th:replace="~{fragments/paginationDisplay::paginationDisplay(@{/user/service/cancelBooking},${paginationReceiver})}">
 
     </th:block>
 </th:block>

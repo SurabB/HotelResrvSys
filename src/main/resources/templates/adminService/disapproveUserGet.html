@@ -54,7 +54,7 @@
 <th:block th:if="${approvedUsers.size()>0}">
 
     <th:block
-            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/admin/resource/adminDisprove},${paginationReceiver})}">
+            th:replace="~{fragments/paginationDisplay::paginationDisplay(@{/admin/resource/adminDisprove},${paginationReceiver})}">
 
     </th:block>
 </th:block>

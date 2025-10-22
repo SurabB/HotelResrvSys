@@ -82,7 +82,7 @@
 <th:block th:if="${allRooms.size()>0}">
 
     <th:block
-            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/business/service/changeRoomInfo},${paginationReceiver})}">
+            th:replace="~{fragments/paginationDisplay::paginationDisplay(@{/business/service/changeRoomInfo},${paginationReceiver})}">
 
     </th:block>
 </th:block>

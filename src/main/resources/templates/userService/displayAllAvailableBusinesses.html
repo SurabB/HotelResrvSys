@@ -65,7 +65,7 @@
 <th:block th:if="${allAvailableBusinesses.size()>0}">
 
     <th:block
-            th:replace="~{fragments/PaginationDisplay::paginationDisplay(@{/user/service/getBusiness},${paginationReceiver})}">
+            th:replace="~{fragments/paginationDisplay::paginationDisplay(@{/user/service/getBusiness},${paginationReceiver})}">
 
     </th:block>
 </th:block>

@@ -1,19 +1,17 @@
 package com.backend.hotelReservationSystem.service.regServ;
 
 import com.backend.hotelReservationSystem.dto.PageSortReceiver;
-import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.enums.Role;
 import com.backend.hotelReservationSystem.dto.commonDto.VerificationTokenAcceptor;
 import com.backend.hotelReservationSystem.entity.MailToken;
 import com.backend.hotelReservationSystem.entity.User;
 import com.backend.hotelReservationSystem.exceptionClasses.TokenInvalidException;
 import com.backend.hotelReservationSystem.repo.UserRepo;
-import com.backend.hotelReservationSystem.utils.SortingFields;
+import com.backend.hotelReservationSystem.enums.SortingFieldRegistry;
 import com.backend.hotelReservationSystem.utils.TokenCreation;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -61,11 +59,11 @@ public class TokenService {
 
     }
 public Page<User> getAllUnapprovedUsers(PageSortReceiver pageSortReceiver){
-    Pageable pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.Approve_UNAPPROVE_USERS);
+    Pageable pageRequest = SortingFieldRegistry.APPROVE_UNAPPROVE_USERS.getPageableObj(pageSortReceiver);
     return userRepo.findUnapprovedUsers(pageRequest);
 }
 public  Page<User> getAllApprovedUsers(PageSortReceiver pageSortReceiver){
-    Pageable pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.Approve_UNAPPROVE_USERS);
+    Pageable pageRequest = SortingFieldRegistry.APPROVE_UNAPPROVE_USERS.getPageableObj(pageSortReceiver);
     return userRepo.findApprovedUsers(Role.ADMIN,pageRequest);
 }
 

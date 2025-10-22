@@ -1,7 +1,6 @@
 package com.backend.hotelReservationSystem.service.actualservice;
 
 import com.backend.hotelReservationSystem.dto.PageSortReceiver;
-import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
@@ -16,12 +15,11 @@ import com.backend.hotelReservationSystem.repo.ReservationRepo;
 import com.backend.hotelReservationSystem.repo.RoomRepo;
 import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
-import com.backend.hotelReservationSystem.utils.SortingFields;
+import com.backend.hotelReservationSystem.enums.SortingFieldRegistry;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -73,7 +71,7 @@ public class BusinessService {
        }
 
     public Page<Room> findRoomByBusinessEmail(String userEmail, PageSortReceiver pageSortReceiver) {
-         Pageable pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.CHANGE_ROOM_INFO);
+         Pageable pageRequest = SortingFieldRegistry.CHANGE_ROOM_INFO.getPageableObj(pageSortReceiver);
         return roomRepo.findRoomByBusinessEmail(userEmail, ReservationStatus.BOOKED,pageRequest);
     }
 
@@ -112,7 +110,7 @@ public class BusinessService {
     }
 
     public Page<ReservationTable> findBookedRooms(String businessEmail, PageSortReceiver pageSortReceiver) {
-        Pageable  pageRequest = SortingFields.getPageableObj(pageSortReceiver,SortingFields.VIEW_BOOKED_ROOMS);
+        Pageable  pageRequest = SortingFieldRegistry.VIEW_BOOKED_ROOMS.getPageableObj(pageSortReceiver);
         return reservationRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
 
 

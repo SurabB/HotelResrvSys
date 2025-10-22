@@ -2,6 +2,7 @@ package com.backend.hotelReservationSystem.service.actualservice;
 
 import com.backend.hotelReservationSystem.entity.User;
 import com.backend.hotelReservationSystem.repo.UserRepo;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

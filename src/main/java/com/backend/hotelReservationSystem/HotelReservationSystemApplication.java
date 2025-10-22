@@ -17,10 +17,10 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 @Slf4j
 public class HotelReservationSystemApplication implements CommandLineRunner {
-private final PasswordEncoder passwordEncoder;
-private  final UserRepo userRepo;
-@Value("${default.admin.email}")
-private String adminEmail;
+//private final PasswordEncoder passwordEncoder;
+//private  final UserRepo userRepo;
+//@Value("${default.admin.email}")
+//private String adminEmail;
 	public static void main(String[] args) {
 		SpringApplication.run(HotelReservationSystemApplication.class, args);
 	}
