@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Home Page</title>
 </head>
 <body>
 <h1> Welcome to Hotel Reservation System</h1>
-<a th:href="@{/common/resource/login}">Login</a>
-<a th:href="@{/common/resource/reg}">Register as User </a>
-<a th:href="@{/business/resource/reg}">Register as Business</a>
-</body>
+<div id="all_anchors">
+<a th:href="@{/common/resource/login}"><i class="fa-solid fa-user-lock"></i></i> Login</a>
+<a th:href="@{/common/resource/reg}"><i class="fa-regular fa-circle-user"></i>Register as User </a>
+<a th:href="@{/business/resource/reg}"><i class="fa-regular fa-circle-user"></i>Register as Business</a>
+</div></body>
+</div>
 </html>
