@@ -6,7 +6,6 @@ import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.session.SessionRegistry;
@@ -23,7 +22,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import java.util.Optional;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableScheduling
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -32,7 +31,8 @@ public class SecurityConfig {
    public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                   AuthenticationSuccessHandler customSuccessHandler,
                                                   AuthenticationFailureHandler customLoginErrorHandler,
-                                                  LogoutSuccessHandler customLogoutSuccessHandler) throws Exception {
+                                                  LogoutSuccessHandler customLogoutSuccessHandler,
+                                                  SessionRegistry sessionRegistry) throws Exception {
        http
                .authorizeHttpRequests(request->
                    request
@@ -58,7 +58,7 @@ public class SecurityConfig {
                .sessionManagement(session->{
                    session
                            .maximumSessions(-1)
-                           .sessionRegistry(sessionRegistry())
+                           .sessionRegistry(sessionRegistry)
                            .expiredUrl("/common/resource/login");
 
                });

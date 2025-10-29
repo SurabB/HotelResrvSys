@@ -14,6 +14,6 @@ public class CustomLogInErrorHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         String message="Login failed. Please try again";
         request.getSession().setAttribute("login_failure_msg", message);
-        response.sendRedirect("/common/resource/login");
+        response.sendRedirect(request.getContextPath()+"/common/resource/login");
     }
 }
