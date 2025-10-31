@@ -1,5 +1,7 @@
 
-
+body{
+    font-family:Arial, sans-serif;
+}
 .success-message{
     color: green;
 }
@@ -13,6 +15,7 @@
     height:400px;
     background-color: #f0f0f0;
     flex-direction: column;
+    border-radius:5%;
 
 }
 .form_container{
@@ -22,7 +25,7 @@
 
 }
 .message_shift{
-    margin-left: 80px;
+    margin-left:10%;
 }
 .form_container_child{
     width:80%;
@@ -34,7 +37,7 @@
     height:50px;
     width:315px;
     margin-top: 15px;
-    margin-left: 70px;
+    margin-left: 7%;
 
 
 }
@@ -46,17 +49,21 @@
     width: 100%;
     background-color:royalblue;
     border-radius: 8px;
+    cursor:pointer;
+
 
 }
 #forgotPass_div{
- margin-left: 85px;
-    margin-top: 15px;
+ margin-left: 10%;
+    margin-top: 4%;
+    cursor:pointer;
 
 }
 #forgotPass_div> a{
     text-decoration: none;
-    color: black;
+    color:  black;
     font-weight:bold;
+
 
 
 }

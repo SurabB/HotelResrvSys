@@ -3,28 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Business DashBoard</title>
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" href="/static/css/dashboard.css">
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
 </head>
 <body>
-<h1>Dashboard</h1>
 <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
     <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
 </th:block>
-
-<a th:href="@{/business/service/businessReg}">Register Business</a>
+<div id="all_anchors">
+<a th:href="@{/business/service/businessReg}"><i class="fa-solid fa-user-plus"></i>Register Business</a>
 <br>
-<a th:href="@{/business/service/addRoom}">Add Room</a>
+<a th:href="@{/business/service/addRoom}"><i class="fa-solid fa-plus"></i>Add Room</a>
 <br>
-<a th:href="@{/business/service/changeRoomInfo}">Change Room Information</a>
+<a th:href="@{/business/service/changeRoomInfo}"><i class="fa-solid fa-retweet"></i>Change Room Information</a>
 <br>
-<a th:href="@{/business/service/findBookedRooms}">Booked Rooms</a>
+<a th:href="@{/business/service/findBookedRooms}"><i class="fa-solid fa-eye"></i>Booked Rooms</a>
 <br>
 <div>
-    <a th:href="@{/common/resource/dashboard}">Back</a>
+    <a th:href="@{/common/resource/dashboard}"><i class="fa-solid fa-backward-step"></i>Back</a>
 </div>
 <br>
-<a th:href="@{/common/resource/logout}">Logout</a>
-
+<a style="color:red;" th:href="@{/common/resource/logout}"><i style="color:red;" class="fa-solid fa-right-to-bracket"></i>Logout</a>
+</div>
+<div id="main_content">
+    <div id="dash_header">
+        <h1>Dashboard</h1>
+    </div>
+    <div id="img_div"><img th:src=@{~/image/hotelPic2.jpg}></div>
+</div>
 </body>
 </html>

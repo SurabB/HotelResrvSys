@@ -8,12 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
-</th:block>
+
 
 <div id="all_anchors">
-<a th:href="@{/admin/resource/reg}"><i class="fa-solid fa-circle-user"></i>Register Admin</a>
+<a th:href="@{/admin/resource/reg}"><i class="fa-solid fa-user-plus"></i>Register Admin</a>
 <br>
 <a th:href="@{/admin/resource/adminApprove}"><i class="fa-solid fa-thumbs-up"></i>Approve Users</a>
 <br>
@@ -24,6 +22,16 @@
 <a style="color:red;" th:href="@{/common/resource/logout}"><i style="color:red;" class="fa-solid fa-right-from-bracket"></i> Logout</a>
 
 </div>
+<div id="main_content">
+    <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
+        <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+    </th:block>
 
+    <div id="dash_header">
+    <h1>Admin Dashboard</h1>
+</div>
+
+<div id="img_div"><img th:src=@{~/image/hotelPic2.jpg}></div>
+</div>
 </body>
 </html>

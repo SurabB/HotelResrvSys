@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Login Page</title>
-    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}" href="/static/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    div>label>i{
+        font-size:x-large;
+        color:royalblue;
+    }
+
+</style>
 </head>
 <body class="flex">
 <form th:action="@{/login}" method="post">
 
     <div id="container" class="flex ">
-        <h1>Login Page</h1>
+        <h1>Login</h1>
     <div id="user_div" class="flex form_container">
-        <label for="username">Username </label>
+        <label for="username"><i style="color:#da0f0f" class="fa-regular fa-envelope"></i> </label>
         <input class="form_container_child" type="email" id="username" name="username" placeholder="Enter your email" required/>
     </div>
     <div id="pass_div" class="flex form_container">
-        <label for="password">Password </label>
+        <label for="password"><i class="fa-solid fa-key"></i> </label>
         <input class="form_container_child" type="password" id="password" name="password" placeholder="Enter Password" required />
     </div>
     <div id="submit_div">
