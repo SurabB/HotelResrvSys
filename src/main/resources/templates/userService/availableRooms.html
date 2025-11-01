@@ -16,6 +16,7 @@
 <table th:if="${availableRooms.size() > 0}">
         <tr>
             <th>SNo</th>
+            <th>Images</th>
             <th>RoomNo</th>
             <th>Room Type
                 <form th:action="@{/user/service/bookRoom}" method="get">
@@ -44,6 +45,7 @@
 
         <tr th:each="room, iterStat : ${availableRooms}">
             <td th:text="${iterStat.count}"></td>
+            <td><img th:src="@{/imageProcessor/displayRoomImage(Uuid=${business.businessUuid}, roomNo=${room.key.roomNumber})}" alt="Image Not available" /></td>
             <td th:text="${room.key.roomNumber}"></td>
             <td th:text="${room.key.roomType}"></td>
             <td th:text="${room.key.pricePerHour}"></td>

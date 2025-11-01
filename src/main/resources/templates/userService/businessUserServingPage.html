@@ -41,7 +41,7 @@
     <div id="logout_div">
 <form th:action="@{/user/service/logout}" method="post">
 
-    <button id="logout_button" type="submit" id="businessLogout"/><i style="color:red;" class="fa-solid fa-right-from-bracket"></i> </button><label for="logout_button">Logout</label>
+    <button id="logout_button" type="submit"/><i style="color:red;" class="fa-solid fa-right-from-bracket"></i> </button><label for="logout_button">Logout</label>
 
 </form>
     </div>
@@ -54,7 +54,7 @@
     <div id="dash_header">
         <h1 th:text="|Welcome to Hotel ${business.businessName}|"></h1>
     </div>
-    <div id="img_div"><img th:src=@{~/image/hotelPic2.jpg} alt="Hotel Pic"></div>
+    <div id="img_div"><img th:src="@{/imageProcessor/businessImage(Uuid=${business.businessUuid})}" alt="Business Image"/></div>
 </div>
 
 </body>

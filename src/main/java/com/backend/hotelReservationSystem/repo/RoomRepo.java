@@ -2,6 +2,7 @@ package com.backend.hotelReservationSystem.repo;
 
 import com.backend.hotelReservationSystem.entity.ReservationTable;
 import com.backend.hotelReservationSystem.entity.Room;
+import com.backend.hotelReservationSystem.entity.embeddable.Image;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -35,4 +36,9 @@ public interface RoomRepo extends JpaRepository<Room,Long> {
     @Query("select r from Room r join r.business b join b.user u where r.roomNumber=:roomNumber and u.email=:businessEmail and u.isActive=true")
     Optional<Room> findParticularRoomByBusinessEmail(Long roomNumber, String businessEmail);
 
+    @Query("select r.roomImage from Room r join r.business b where b.businessUuid=:uuid and r.roomNumber=:roomNo")
+    Optional<Image> findRoomImageByBusinessUuid(String uuid,Long roomNo);
+
+    @Query("select r.roomImage from Room r join r.business b join b.user u where u.email=:email and u.isActive=true and r.roomNumber=:roomNo")
+    Optional<Image> findRoomImageByBusinessEmail(String email,Long roomNo);
 }

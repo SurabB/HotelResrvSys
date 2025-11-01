@@ -2,6 +2,7 @@ package com.backend.hotelReservationSystem.service.actualservice;
 
 import com.backend.hotelReservationSystem.dto.PageSortReceiver;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
+import com.backend.hotelReservationSystem.entity.embeddable.Image;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomUpdateDto;
@@ -9,6 +10,7 @@ import com.backend.hotelReservationSystem.entity.Business;
 import com.backend.hotelReservationSystem.entity.ReservationTable;
 import com.backend.hotelReservationSystem.entity.Room;
 import com.backend.hotelReservationSystem.entity.User;
+import com.backend.hotelReservationSystem.exceptionClasses.BookingCancellationException;
 import com.backend.hotelReservationSystem.exceptionClasses.StaleUserException;
 import com.backend.hotelReservationSystem.repo.BusinessRepo;
 import com.backend.hotelReservationSystem.repo.ReservationRepo;
@@ -16,16 +18,22 @@ import com.backend.hotelReservationSystem.repo.RoomRepo;
 import com.backend.hotelReservationSystem.repo.UserRepo;
 import com.backend.hotelReservationSystem.utils.CustomBuilder;
 import com.backend.hotelReservationSystem.enums.SortingFieldRegistry;
+import com.backend.hotelReservationSystem.utils.SomeHelpers;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.apache.tika.Tika;
+import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.IllegalFormatFlagsException;
 import java.util.Optional;
 
 
@@ -75,7 +83,7 @@ public class BusinessService {
         return roomRepo.findRoomByBusinessEmail(userEmail, ReservationStatus.BOOKED,pageRequest);
     }
 
-    public boolean changeRoomInfo(RoomUpdateDto roomUpdateDto, String businessEmail) {
+    public boolean changeRoomInfo(RoomUpdateDto roomUpdateDto, String businessEmail) throws IOException {
 //   check if there is a room that has room number associated with business that user wants to change.
         Optional<Room> particularRoomByBusinessEmail = roomRepo.findParticularRoomByBusinessEmail(roomUpdateDto.getActiveRoomNumber(), businessEmail);
 
@@ -104,6 +112,17 @@ public class BusinessService {
         BigDecimal UserProvidePricePerHour = roomUpdateDto.getPricePerHour();
         if(UserProvidePricePerHour!=null &&UserProvidePricePerHour.compareTo(BigDecimal.ZERO)>0){
             room.setPricePerHour(UserProvidePricePerHour);
+        }
+        MultipartFile imageFile = roomUpdateDto.getMultipartFile();
+        if(imageFile!=null&& !imageFile.isEmpty()){
+            Tika tika=new Tika();
+            boolean imageTypeValid = SomeHelpers.isImageTypeValid(imageFile,tika);
+            if(imageTypeValid) {
+                room.setRoomImage(new Image(tika.detect(imageFile.getInputStream()),imageFile.getBytes()));
+            }
+            else {
+                throw new MultipartStream.MalformedStreamException("Provided file format does not match expected file format.Allowed format: image/");
+            }
         }
       roomRepo.save(room);
       return true;

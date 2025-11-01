@@ -49,13 +49,16 @@
             </form>
         </th>
         <th> Change Status</th>
+        <th>Room</th>
+        <th>change Image</th>
         <th>Change Room Info</th>
     </tr>
     </thead>
 
     <tbody>
     <tr th:each="room, stat : ${allRooms}">
-        <form th:action="@{/business/service/changeRoomInfo}" method="post">
+        <form th:action="@{/business/service/changeRoomInfo}" method="post"  enctype="multipart/form-data">
+
             <td th:text="${stat.count}"></td>
             <td th:text="${room.roomNumber}"></td>
 
@@ -68,9 +71,13 @@
                        th:value="${room.roomIsActive}"
                        th:checked="false" />
             </td>
+            <td><div id="imageDisplay"><img th:src="@{/imageProcessor/displayRoomImage(roomNo=${room.roomNumber})}" alt="Image Not available" /></div></td>
+
+            <td>
+                <input type="file" value="upload Image" id="imageFile" name="multipartFile">
+            </td>
 
             <td><button type="submit">Change Room Info</button></td>
-
             <input type="hidden" name="activeRoomNumber" th:value="${room.roomNumber}">
             <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
 

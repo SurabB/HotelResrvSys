@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 @AllArgsConstructor
@@ -22,6 +23,8 @@ public class RoomUpdateDto {
     @Digits(integer = 6, fraction = 2,message = "Max digit before floating points is six and precision is two ")
     @Positive(message = "Price Per Hour should be Greater than Zero")
     private BigDecimal pricePerHour;
+
+    MultipartFile multipartFile;
 
     private String roomType;
 

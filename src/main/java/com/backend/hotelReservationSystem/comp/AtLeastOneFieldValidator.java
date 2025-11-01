@@ -14,7 +14,9 @@ public class AtLeastOneFieldValidator implements ConstraintValidator<AtLeastOneF
         boolean roomIsActiveFilled = form.getRoomIsActive() != null;
         boolean pricePerHourFilled = form.getPricePerHour() != null;
         boolean roomTypeFilled = form.getRoomType() != null && !form.getRoomType().isBlank()&&form.getRoomType().length()<50;
+        boolean imageFile = form.getMultipartFile() != null && !form.getMultipartFile().isEmpty();
 
-        return roomIsActiveFilled || pricePerHourFilled || roomTypeFilled; // at least one must be filled
+
+        return roomIsActiveFilled || pricePerHourFilled || roomTypeFilled ||imageFile; // at least one must be filled
     }
 }

@@ -33,7 +33,7 @@ input[type="number"], input[type="text"] {
     border-radius: 4px;
 }
 
-button {
+button,#imageFile {
     background-color: #28a745;
     color: white;
     border: none;
@@ -42,7 +42,18 @@ button {
     cursor: pointer;
     transition: background-color 0.2s;
 }
+/*#imageDisplay{*/
+/*    max-width:20rem;*/
+/*    max-height:20rem;*/
 
+/*}*/
+#imageDisplay>img{
+    height:5rem;
+    width:7rem
+    background-size:cover;
+    background-position: center; /* Centers the image within the div */
+    background-repeat: no-repeat;
+}
 button:hover {
     background-color: #218838;
 }

@@ -1,5 +1,6 @@
 package com.backend.hotelReservationSystem.entity;
 
+import com.backend.hotelReservationSystem.entity.embeddable.Image;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,6 +38,10 @@ public class Room {
 
     @Column(nullable = false,name = "room_is_active")
     private  Boolean roomIsActive;
+
+    @Column(name = "room_image")
+    @Embedded
+    Image roomImage;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="business_id",

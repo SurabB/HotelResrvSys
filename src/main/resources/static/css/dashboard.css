@@ -77,6 +77,6 @@ a>i{
     height:90%;
     width:90%;
     background-size:cover;
-    background-position: center; /* Centers the image within the div */
+    background-position: center;
     background-repeat: no-repeat;
 }
