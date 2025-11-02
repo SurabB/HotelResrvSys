@@ -39,9 +39,9 @@
 </head>
 <body>
 <div class="error_container">
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
-</th:block>
+    <th:block>
+        <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
+    </th:block>
 
 <div th:if="${authError!=null}">
     <p class="error" th:text="${authError}"></p>

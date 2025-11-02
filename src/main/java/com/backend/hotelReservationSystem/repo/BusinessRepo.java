@@ -1,7 +1,7 @@
 package com.backend.hotelReservationSystem.repo;
 
 import com.backend.hotelReservationSystem.entity.Business;
-import com.backend.hotelReservationSystem.entity.embeddable.Image;
+import com.backend.hotelReservationSystem.entity.Image;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,9 +23,9 @@ public interface BusinessRepo extends JpaRepository<Business,Long> {
     @Query("select b from Business b join b.user u where u.isActive=true and u.email=:email")
     Optional<Business> findBusinessByEmail(String email);
 
-    @Query("select b.businessImage from Business b join b.user u where u.isActive=true and b.businessUuid=:id")
+    @Query("select b.image from Business b join b.user u where u.isActive=true and b.businessUuid=:id")
     Optional<Image> findBusinessImageByUuid(String id);
 
-    @Query("select b.businessImage from Business b join b.user u where u.isActive=true and u.email=:email")
+    @Query("select b.image from Business b join b.user u where u.isActive=true and u.email=:email")
     Optional<Image> findBusinessImageByEmail(String email);
 }

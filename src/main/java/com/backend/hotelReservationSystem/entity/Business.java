@@ -1,6 +1,5 @@
 package com.backend.hotelReservationSystem.entity;
 
-import com.backend.hotelReservationSystem.entity.embeddable.Image;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,8 +37,9 @@ public class Business {
     @Column(name="location",nullable = false)
     private String location;
 
-    @Embedded
-    private Image businessImage;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
 
 
     @OneToOne

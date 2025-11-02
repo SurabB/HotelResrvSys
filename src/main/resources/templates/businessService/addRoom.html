@@ -32,8 +32,8 @@
         </div>
     </div>
 </form>
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+<th:block>
+    <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
 </th:block>
 <br>
 <a th:href="@{/business/resource/dashboard}">Back</a>

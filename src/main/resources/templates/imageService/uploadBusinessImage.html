@@ -11,13 +11,16 @@
     <label for="imageFile">Select Image:</label>
     <input type="file" id="imageFile" name="imageFile" required>
     <button type="submit">Upload</button>
-    <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-        <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+    <th:block>
+        <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
     </th:block>
 </form>
 <br>
 <form th:action="@{/imageProcessor/deleteBusinessImage}" method="post">
     <button type="submit">Remove Current Picture</button>
 </form>
+<div id="back">
+    <a th:href="@{/business/resource/dashboard}">Back</a>
+</div>
 </body>
 </html>

@@ -16,8 +16,8 @@
 </script>
 <body>
 
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+<th:block>
+    <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
 </th:block>
 <div th:text="|BusinessName:${business.businessName}, city:${business.cityName}, location:${business.location}|"></div>
 <table th:if="${bookingsAndRefundableAmt.size() > 0}">

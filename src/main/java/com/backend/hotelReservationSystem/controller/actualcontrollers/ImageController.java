@@ -1,16 +1,22 @@
 package com.backend.hotelReservationSystem.controller.actualcontrollers;
 
+import com.backend.hotelReservationSystem.dto.PageSortReceiver;
+import com.backend.hotelReservationSystem.dto.PaginationReceiver;
 import com.backend.hotelReservationSystem.entity.Business;
 import com.backend.hotelReservationSystem.entity.Room;
-import com.backend.hotelReservationSystem.entity.embeddable.Image;
+import com.backend.hotelReservationSystem.entity.Image;
+import com.backend.hotelReservationSystem.enums.SortingFieldRegistry;
 import com.backend.hotelReservationSystem.exceptionClasses.RoomNotFoundException;
 import com.backend.hotelReservationSystem.repo.BusinessRepo;
 import com.backend.hotelReservationSystem.repo.RoomRepo;
 import com.backend.hotelReservationSystem.utils.SomeHelpers;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tika.Tika;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +25,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +34,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.Optional;
-import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
@@ -64,7 +70,7 @@ public class ImageController {
 
             Optional<Business> businessByEmail = businessRepo.findBusinessByEmail(principal.getName());
             Business foundBusiness = businessByEmail.orElseThrow(() -> new UsernameNotFoundException("Business not found"));
-            foundBusiness.setBusinessImage(new Image(tika.detect(multipartFile.getInputStream()), multipartFile.getBytes()));
+            foundBusiness.setImage(new Image(tika.detect(multipartFile.getInputStream()), multipartFile.getBytes()));
             businessRepo.save(foundBusiness);
             redirectAttributes.addFlashAttribute("success", "Image added successfully");
             return "redirect:/imageProcessor/uploadBusinessImage";
@@ -96,7 +102,7 @@ public class ImageController {
 
             Optional<Room> roomFromDb = roomRepo.findParticularRoomByBusinessEmail(roomNo,principal.getName());
             Room room = roomFromDb.orElseThrow(() -> new RoomNotFoundException("Room not found"));
-            room.setRoomImage(new Image(tika.detect(multipartFile.getInputStream()), multipartFile.getBytes()));
+            room.setImage(new Image(tika.detect(multipartFile.getInputStream()), multipartFile.getBytes()));
             roomRepo.save(room);
             redirectAttributes.addFlashAttribute("success", "Room Image added successfully");
             return "redirect:/imageProcessor/uploadRoomImage";
@@ -167,7 +173,7 @@ public class ImageController {
         try {
             Optional<Business> businessFromDb = businessRepo.findBusinessByEmail(principal.getName());
             Business business = businessFromDb.orElseThrow(() -> new UsernameNotFoundException("Business Not found"));
-            business.setBusinessImage(null);
+            business.setImage(null);
             redirectAttributes.addFlashAttribute("success", "Image removed successfully");
             return "redirect:/imageProcessor/uploadBusinessImage";
         }
@@ -180,6 +186,45 @@ public class ImageController {
         }
 
 
+
+    }
+    @GetMapping("/deleteRoomImages")
+    public String deleteRoomImages(@Valid @ModelAttribute PageSortReceiver pageSortReceiver,Principal principal,Model model,RedirectAttributes redirectAttributes){
+        Pageable pageableObj = SortingFieldRegistry.CHANGE_ROOM_INFO.getPageableObj(pageSortReceiver);
+        Page<Room> roomByBusinessEmail = roomRepo.findRoomByBusinessEmail(principal.getName(), pageableObj);
+        int totalPages = roomByBusinessEmail.getTotalPages();
+        if(totalPages<pageSortReceiver.getPageNo()&&totalPages>0){
+            redirectAttributes.addAttribute("pageNo",totalPages);
+            return "redirect:/imageProcessor/deleteRoomImages";
+
+        }
+        PaginationReceiver paginationReceiver=new PaginationReceiver(totalPages,pageSortReceiver.getPageNo());
+        model.addAttribute("rooms",roomByBusinessEmail.toList());
+        model.addAttribute("paginationReceiver",paginationReceiver);
+        return "businessService/deleteRoomImages";
+    }
+    @PostMapping("/deleteRoomImages")
+    @Validated
+    public String deleteRoomImages(@NotNull @RequestParam(value = "roomNo")Long roomNo,
+                                   @RequestParam(value = "pageNo",defaultValue = "1")Integer pageNo,
+                                   Principal principal, RedirectAttributes redirectAttributes, Model model){
+
+        redirectAttributes.addAttribute("pageNo",pageNo);
+        try {
+            Optional<Room> particularRoomByBusinessEmail = roomRepo.findParticularRoomByBusinessEmail(roomNo, principal.getName());
+            Room room = particularRoomByBusinessEmail.orElseThrow(() -> new RoomNotFoundException("Room not found"));
+            room.setImage(null);
+            roomRepo.save(room);
+            redirectAttributes.addFlashAttribute("success", "Room Image removed successfully");
+            return "redirect:/imageProcessor/deleteRoomImages";
+        }
+        catch (RoomNotFoundException e){
+            redirectAttributes.addFlashAttribute("failure", e.getMessage());
+            return "redirect:/imageProcessor/deleteRoomImages";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("failure", "something went wrong");
+            return "redirect:/imageProcessor/deleteRoomImages";
+        }
 
     }
 

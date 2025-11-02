@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class CustomBuilder {
+public class giCustomBuilder {
     public static  User buildUser(String email, Role role){
         boolean isAdminApproved= (role == Role.USER);
           return User.builder()

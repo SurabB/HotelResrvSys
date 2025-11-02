@@ -48,8 +48,8 @@
 
 </div>
 <div id="main_content">
-    <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-        <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+    <th:block>
+        <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
     </th:block>
     <div id="dash_header">
         <h1 th:text="|Welcome to Hotel ${business.businessName}|"></h1>

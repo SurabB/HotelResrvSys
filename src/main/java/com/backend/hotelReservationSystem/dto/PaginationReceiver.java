@@ -12,8 +12,8 @@ import java.util.ArrayDeque;
 public class PaginationReceiver {
     private final Integer totalPages;
     private  final Integer pageNo;
-    private static final int PAGE_DISPLAY=2;
-    public static final int PAGE_SIZE=5;
+    private static final int PAGE_DISPLAY=3;
+    public static final int PAGE_SIZE=1;
 
     public ArrayDeque<Integer> indexes(){
         int count=pageNo;

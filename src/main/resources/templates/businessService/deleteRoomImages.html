@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Remove Room Image</title>
+  <link rel="stylesheet" th:href="@{/css/table.css}">
+  <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+</head>
+<body>
+<th:block>
+  <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
+</th:block>
+<table>
+  <thead>
+  <tr>
+    <th>SNo</th>
+    <th>RoomNo
+      <form th:action="@{/imageProcessor/deleteRoomImages}" method="get">
+        <input type="hidden" th:value="${paginationReceiver.pageNo}" name="pageNo"/>
+        <input type="hidden" value="roomNumber" name="sortField"/>
+        <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+        <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+      </form>
+    </th>
+    <th>PricePerHour
+    <form th:action="@{/imageProcessor/deleteRoomImages}" method="get">
+      <input type="hidden" th:value="${paginationReceiver.pageNo}" name="pageNo"/>
+      <input type="hidden" value="pricePerHour" name="sortField"/>
+      <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+      <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+    </form>
+
+    </th>
+    <th>Availability Status
+    </th>
+    <th>Room Type
+      <form th:action="@{/imageProcessor/deleteRoomImages}" method="get">
+        <input type="hidden" th:value="${paginationReceiver.pageNo}" name="pageNo"/>
+        <input type="hidden" value="roomType" name="sortField"/>
+        <button type="submit" name="sortDir" value="desc" style="border:none; background:none; cursor:pointer;">▲</button>
+        <button type="submit" name="sortDir" value="asc" style="border:none; background:none; cursor:pointer;">▼</button>
+      </form>
+    </th>
+    <th>Room Image</th>
+    <th>Remove Image</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="room,roomStat: ${rooms}" >
+    <td th:text="${roomStat.count}"></td>
+    <td th:text="${room.roomNumber}"></td>
+    <td th:text="${room.pricePerHour}"></td>
+    <td th:text="${room.roomIsActive? 'ACTIVE':'INACTIVE'}"></td>
+    <td th:text="${room.roomType}"></td>
+    <td><div id="imageDisplay"><img th:src="@{/imageProcessor/displayRoomImage(roomNo=${room.roomNumber})}" alt="Image Not available" /></div></td>
+    <form th:action="@{/imageProcessor/deleteRoomImages}" method="post">
+      <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
+      <input type="hidden" name="roomNo" th:value="${room.roomNumber}">
+      <td><button type="submit" >Submit</button></td>
+    </form>
+
+  </tr>
+  </tbody>
+</table>
+<div id="pagination_display">
+<th:block th:if="${rooms.size()>0}">
+
+  <th:block
+          th:replace="~{fragments/paginationDisplay::paginationDisplay(@{/imageProcessor/deleteRoomImages},${paginationReceiver})}">
+
+  </th:block>
+</th:block>
+</div>
+<div id="back">
+  <a th:href="@{/business/resource/dashboard}">Back</a>
+</div>
+</body>
+</html>

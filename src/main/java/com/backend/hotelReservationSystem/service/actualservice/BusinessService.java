@@ -2,7 +2,7 @@ package com.backend.hotelReservationSystem.service.actualservice;
 
 import com.backend.hotelReservationSystem.dto.PageSortReceiver;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.BusinessRegAcceptor;
-import com.backend.hotelReservationSystem.entity.embeddable.Image;
+import com.backend.hotelReservationSystem.entity.Image;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomAcceptorDto;
 import com.backend.hotelReservationSystem.dto.businessServiceDto.RoomUpdateDto;
@@ -10,7 +10,6 @@ import com.backend.hotelReservationSystem.entity.Business;
 import com.backend.hotelReservationSystem.entity.ReservationTable;
 import com.backend.hotelReservationSystem.entity.Room;
 import com.backend.hotelReservationSystem.entity.User;
-import com.backend.hotelReservationSystem.exceptionClasses.BookingCancellationException;
 import com.backend.hotelReservationSystem.exceptionClasses.StaleUserException;
 import com.backend.hotelReservationSystem.repo.BusinessRepo;
 import com.backend.hotelReservationSystem.repo.ReservationRepo;
@@ -33,7 +32,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.IllegalFormatFlagsException;
 import java.util.Optional;
 
 
@@ -80,7 +78,7 @@ public class BusinessService {
 
     public Page<Room> findRoomByBusinessEmail(String userEmail, PageSortReceiver pageSortReceiver) {
          Pageable pageRequest = SortingFieldRegistry.CHANGE_ROOM_INFO.getPageableObj(pageSortReceiver);
-        return roomRepo.findRoomByBusinessEmail(userEmail, ReservationStatus.BOOKED,pageRequest);
+        return roomRepo.findRoomByBusinessEmail(userEmail, pageRequest);
     }
 
     public boolean changeRoomInfo(RoomUpdateDto roomUpdateDto, String businessEmail) throws IOException {
@@ -118,7 +116,7 @@ public class BusinessService {
             Tika tika=new Tika();
             boolean imageTypeValid = SomeHelpers.isImageTypeValid(imageFile,tika);
             if(imageTypeValid) {
-                room.setRoomImage(new Image(tika.detect(imageFile.getInputStream()),imageFile.getBytes()));
+                room.setImage(new Image(tika.detect(imageFile.getInputStream()),imageFile.getBytes()));
             }
             else {
                 throw new MultipartStream.MalformedStreamException("Provided file format does not match expected file format.Allowed format: image/");
@@ -131,9 +129,5 @@ public class BusinessService {
     public Page<ReservationTable> findBookedRooms(String businessEmail, PageSortReceiver pageSortReceiver) {
         Pageable  pageRequest = SortingFieldRegistry.VIEW_BOOKED_ROOMS.getPageableObj(pageSortReceiver);
         return reservationRepo.findBookedReservationAndRooms(businessEmail, ReservationStatus.BOOKED,ReservationStatus.CHECKED_IN,LocalDateTime.now(),pageRequest);
-
-
-
-
     }
 }

@@ -5,18 +5,18 @@
     <title>Fragment</title>
 </head>
 <body>
-<div th:fragment="successFailureFragment(margins)">
+<div th:fragment="successFailureFragment()">
 <div th:if="${success != null}">
-    <p th:text="${success}"  th:style="'margin:' + ${#strings.listJoin(margins, ' ')}" class="success_message"></p>
+    <p th:text="${success}"  class="success_message"></p>
 
 </div>
 <div th:if="${failure != null}">
-    <p th:text="${failure}"  th:style="'margin:' + ${#strings.listJoin(margins, ' ')}" class="error_message"></p>
+    <p th:text="${failure}"  class="error_message"></p>
 
 </div>
 <div th:if="${fieldErrors != null}">
     <div th:each="err : ${fieldErrors}">
-        <p  class="error_message"  th:text="${err}" th:style="'margin:' + ${#strings.listJoin(margins, ' ')}"></p>
+        <p  class="error_message"  th:text="${err}" ></p>
     </div>
 </div>
 </div>

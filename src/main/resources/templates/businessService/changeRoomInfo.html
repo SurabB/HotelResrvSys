@@ -8,8 +8,8 @@
 </head>
 <body>
 
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+<th:block>
+    <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
 </th:block>
 
 <table th:if="${allRooms.size() > 0}">
@@ -94,8 +94,10 @@
     </th:block>
 </th:block>
 <br>
+<div id="back">
 <a th:href="@{/business/resource/dashboard}">Back</a>
-<br>
+</div>
+
 
 <h1 th:if="${allRooms.size() == 0}" style="color: red;">
     All rooms are booked. Can't change Room information

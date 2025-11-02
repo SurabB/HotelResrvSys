@@ -25,6 +25,9 @@
         <div id="submit_div">
             <button type="submit">Register</button>
         </div>
+        <th:block>
+            <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
+        </th:block>
     </div>
 </form>
 <br>

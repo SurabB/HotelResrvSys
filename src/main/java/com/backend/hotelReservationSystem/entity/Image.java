@@ -1,4 +1,4 @@
-package com.backend.hotelReservationSystem.entity.embeddable;
+package com.backend.hotelReservationSystem.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,10 +8,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
+@Entity
 public class Image {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "image_type")
     private String imageType;
 
@@ -19,4 +23,9 @@ public class Image {
     @Column(name="image",columnDefinition = "MEDIUMBLOB")
     @Basic(fetch = FetchType.LAZY)
     private byte[] image;
+
+    public Image(String imageType,byte[] image){
+        this.imageType=imageType;
+        this.image=image;
+    }
 }

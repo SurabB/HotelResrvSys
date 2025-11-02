@@ -11,10 +11,13 @@
 <form th:action="@{/imageProcessor/uploadRoomImage}" method="post" enctype="multipart/form-data">
     <label for="imageFile">Select Image:</label>
     <input type="file" value="upload Image" id="imageFile" name="imageFile" required>
-    <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-        <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+    <th:block>
+        <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
     </th:block>
     <button type="submit">Upload</button>
+    <div id="back">
+        <a th:href="@{/business/resource/dashboard}">Back</a>
+    </div>
 </form>
 </body>
 </html>

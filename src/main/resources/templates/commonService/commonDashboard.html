@@ -19,8 +19,8 @@
     <div id="dash_header">
     <h1> Welcome to Hotel Reservation System</h1>
 </div>
-    <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-        <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+    <th:block>
+        <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
     </th:block>
     <div id="img_div"><img th:src=@{~/image/hotelPic2.jpg} alt="Hotel Pic"></div>
 </div>
