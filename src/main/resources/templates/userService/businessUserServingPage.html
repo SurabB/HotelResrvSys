@@ -16,9 +16,10 @@
     #logout_div>label{
         color:red;
     }
-    #logout_button:hover,#logout_div>label:hover,#logout_div:hover{
+    #logout_button:hover,#logout_div>form>label:hover,#logout_div:hover{
         background-color: #fffdfd;
         cursor:pointer;
+        border-radius:7px;
     }
     #logout_div{
         padding:3%;
@@ -40,9 +41,7 @@
 
     <div id="logout_div">
 <form th:action="@{/user/service/logout}" method="post">
-
-    <button id="logout_button" type="submit"/><i style="color:red;" class="fa-solid fa-right-from-bracket"></i> </button><label for="logout_button">Logout</label>
-
+    <button  id="logout_button" type="submit"/><i style="color:red;" class="fa-solid fa-right-from-bracket"></i> </button><label style="color:red;" for="logout_button">Logout</label>
 </form>
     </div>
 

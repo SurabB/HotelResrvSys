@@ -51,6 +51,7 @@
     </tr>
     </tbody>
 </table>
+<div id="pagination_display">
 <th:block th:if="${approvedUsers.size()>0}">
 
     <th:block
@@ -58,7 +59,8 @@
 
     </th:block>
 </th:block>
-<div>
+</div>
+<div id="back">
     <a th:href="@{/admin/resource/dashboard}">Back</a>
 </div>
 <h1 th:if="${approvedUsers.size()==0}" style="color: green;">All users already are not approved</h1>

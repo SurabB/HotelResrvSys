@@ -156,8 +156,8 @@ public class ImageController {
             else image=Optional.empty();
         }
         if(image.isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null);
+            return ResponseEntity.ok()
+                    .body(new byte[]{});
         }
         Image businessImage = image.get();
         return ResponseEntity.ok()

@@ -68,7 +68,8 @@ a>i{
 #dash_header{
     position:relative;
     top:0;
-    margin-bottom:5px;
+    margin-bottom:3px;
+    margin-top:10px;
 }
 #img_div{
     height:100%;
@@ -78,7 +79,9 @@ a>i{
 }
 #img_div>img{
     height:90%;
-    width:95%;
+    width:90%;
+
+
     background-size:cover;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);

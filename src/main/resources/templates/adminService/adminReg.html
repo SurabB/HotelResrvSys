@@ -9,9 +9,8 @@
 </head>
 <body>
 <div th:replace="~{fragments/emailFragment :: registrationForm('Admin Registration', @{/admin/resource/reg})}"></div>
-<div>
-    <a th:href="@{/admin/resource/dashboard}">Back</a>
-</div>
+    <a id="back"  th:href="@{/admin/resource/dashboard}">Back</a>
+
 
 </body>
 </html>

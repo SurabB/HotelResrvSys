@@ -42,14 +42,16 @@ button,#imageFile {
     cursor: pointer;
     transition: background-color 0.2s;
 }
-/*#imageDisplay{*/
-/*    max-width:20rem;*/
-/*    max-height:20rem;*/
+#imageDisplay{
+    max-width:10rem;
+    max-height:10rem;
 
-/*}*/
+}
 #imageDisplay>img{
-    height:5rem;
-    width:7rem
+    height:100%;
+    width:100%;
+    max-height:100%;
+    max-width:100%;
     background-size:cover;
     background-position: center; /* Centers the image within the div */
     background-repeat: no-repeat;
@@ -92,4 +94,7 @@ input::placeholder {
 }
 #back{
     margin-left:16%;
+}
+#successFailure_div{
+    margin-left:30%;
 }

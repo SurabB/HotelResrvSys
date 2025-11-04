@@ -5,7 +5,7 @@
     <title>Fragment</title>
 </head>
 <body>
-<div th:fragment="successFailureFragment()">
+<div id="successFailure_div" th:fragment="successFailureFragment()">
 <div th:if="${success != null}">
     <p th:text="${success}"  class="success_message"></p>
 

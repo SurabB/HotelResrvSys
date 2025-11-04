@@ -2,8 +2,9 @@
 
 body{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
+    align-items:center;
 
 }
 .form_container{
@@ -14,6 +15,7 @@ body{
     height: 50vh;
     width: 100vh;
     background-color: #f0f0f0;
+    border-radius:12px;
 }
 #submit_div{
     height:60%;
@@ -50,4 +52,23 @@ body{
 .email_container label{
     margin-right:4%;
     font-size: large;
+}
+#back{
+    display:inline-block;
+    padding: 10px 18px;
+    border-radius:7px;
+    background-color:#f0f0f0;
+    border:2px solid transparent;
+    cursor:pointer;
+    margin-top:20px;
+    color:black;
+    text-decoration:none;
+    align-content:center;
+
+
+}
+
+#back:hover{
+    background-color:royalblue;
+    color:white;
 }

@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SomeHelpers {
-    public static final Set<String> ALLOWED_IMG_TYPE=Set.of("jpeg","png","jpg");
+    public static final Set<String> ALLOWED_IMG_TYPE=Set.of("jpeg","png","jpg","webp");
 
     public static  Map<ReservationTable, BigDecimal> convertToMap(List<ReservationTable> bookingsOfParticularUser){
        return

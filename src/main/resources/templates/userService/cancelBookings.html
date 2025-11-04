@@ -105,6 +105,7 @@
     </tr>
     </tbody>
 </table>
+<div id="pagination_display">
 <th:block th:if="${bookingsAndRefundableAmt.size()>0}">
 
     <th:block
@@ -112,9 +113,10 @@
 
     </th:block>
 </th:block>
-<br>
+</div>
+<div id="back">
 <a th:href="@{/user/service/businessPage}">Back</a>
-<br>
+</div>
 <h1 th:if="${bookingsAndRefundableAmt.size()==0}" style="color: red;">No Rooms Booked</h1>
 </body>
 </html>
