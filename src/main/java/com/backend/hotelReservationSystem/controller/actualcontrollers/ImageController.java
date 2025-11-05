@@ -137,7 +137,7 @@ public class ImageController {
             Image businessImage = image.get();
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, businessImage.getImageType())
-                    .header(HttpHeaders.CACHE_CONTROL, "max-age=600")
+                   // .header(HttpHeaders.CACHE_CONTROL, "max-age=600")
                     .body(businessImage.getImage());
 
 
@@ -162,7 +162,7 @@ public class ImageController {
         Image businessImage = image.get();
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, businessImage.getImageType())
-                .header(HttpHeaders.CACHE_CONTROL, "max-age=600")
+               // .header(HttpHeaders.CACHE_CONTROL, "max-age=600")
                 .body(businessImage.getImage());
 
 

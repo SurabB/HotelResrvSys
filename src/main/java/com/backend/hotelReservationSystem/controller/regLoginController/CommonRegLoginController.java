@@ -144,14 +144,11 @@ public class CommonRegLoginController {
 
     @GetMapping("/roleBasedDashboard")
     public  String roleBasedDashboard(@AuthenticationPrincipal UserDetails userDetails,RedirectAttributes redirectAttributes){
-        System.out.println("inside");
         if (userDetails==null){
-            System.out.println("inside null");
             redirectAttributes.addFlashAttribute("failure","You need to login first");
             return "redirect:/common/resource/dashboard";
         }
         String userRole = userDetails.getAuthorities().toString();
-        System.out.println(userRole);
         String redirectPoint=switch (userRole){
            case "[ROLE_USER]"-> "redirect:/user/resource/dashboard";
            case "[ROLE_BUSINESS]"-> "redirect:/business/resource/dashboard";

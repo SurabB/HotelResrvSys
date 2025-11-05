@@ -17,29 +17,29 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 @Slf4j
 public class HotelReservationSystemApplication implements CommandLineRunner {
-//private final PasswordEncoder passwordEncoder;
-//private  final UserRepo userRepo;
-//@Value("${default.admin.email}")
-//private String adminEmail;
+private final PasswordEncoder passwordEncoder;
+private  final UserRepo userRepo;
+@Value("${default.admin.email}")
+private String adminEmail;
 	public static void main(String[] args) {
 		SpringApplication.run(HotelReservationSystemApplication.class, args);
 	}
 
 	@Override
-	public void run(String... args) throws Exception {
-//		User user = User.builder()
-//				.email(adminEmail)
-//				.role(Role.ADMIN)
-//				.password(passwordEncoder.encode("password"))
-//				.isAdminApproved(true)
-//				.isEmailVerified(true)
-//				.bankBalance(new BigDecimal("1200"))
-//				.build();
-//		try {
-//			userRepo.save(user);
-//		}
-//		catch (Exception e){
-//            log.warn("failed to add default admin,reason:{}", e.getMessage());
-//		}
+	public void run(String... args) {
+		User user = User.builder()
+				.email(adminEmail)
+				.role(Role.ADMIN)
+				.password(passwordEncoder.encode("password"))
+				.isAdminApproved(true)
+				.isEmailVerified(true)
+				.bankBalance(new BigDecimal("1200"))
+				.build();
+		try {
+			userRepo.save(user);
+		}
+		catch (Exception e){
+            log.warn("failed to add default admin,reason:{}", e.getMessage());
+		}
 	}
 }

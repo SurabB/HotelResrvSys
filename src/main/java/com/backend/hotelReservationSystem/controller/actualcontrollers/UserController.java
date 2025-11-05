@@ -206,7 +206,6 @@ catch (Exception e) {
 
             // 2 books room based on above credentials
            userService.bookRoom(roomBook,user,business.getBusinessId());
-            System.out.println("in room book post success"+time);
             redirectAttributes.addFlashAttribute("success", "Room booked successfully");
             return "redirect:/user/service/bookRoom";
         }

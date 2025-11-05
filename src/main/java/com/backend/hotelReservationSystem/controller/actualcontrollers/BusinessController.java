@@ -90,7 +90,6 @@ public class BusinessController {
             return "redirect:/business/service/addRoom";
         }
         catch (Exception ex) {
-            System.out.println(ex.getMessage());
                 redirectAttributes.addFlashAttribute("failure", "Something went wrong on server side.");
                 return "redirect:/business/service/addRoom";
         }
