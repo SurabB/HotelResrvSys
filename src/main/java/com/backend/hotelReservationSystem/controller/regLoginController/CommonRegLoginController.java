@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 @Slf4j
 @Controller
@@ -112,7 +115,7 @@ public class CommonRegLoginController {
         }
         try {
             Optional<User> userFromDb = userRepo.findUserByEmail(emailDto.getEmail());
-            String verificationMsg = "If the entered email is associated with an account and is verified, an email has been sent with instructions of how to reset the password";
+            String verificationMsg = "If the entered email is associated with an account and is verified, an email has been sent with password reset token to reset the password";
             userFromDb.filter(user -> user.getIsEmailVerified()
                             && (user.getMailToken() == null
                             || user.getMailToken().getExpiryDate().isBefore(LocalDateTime.now())
@@ -138,6 +141,26 @@ public class CommonRegLoginController {
         return "error";
     }
 
+
+    @GetMapping("/roleBasedDashboard")
+    public  String roleBasedDashboard(@AuthenticationPrincipal UserDetails userDetails,RedirectAttributes redirectAttributes){
+        if (userDetails==null){
+            redirectAttributes.addFlashAttribute("failure","You need to login first");
+            return "redirect:/common/resource/dashboard";
+        }
+        String userRole = userDetails.getAuthorities().toString();
+        String redirectPoint=switch (userRole){
+           case "[ROLE_USER]"-> "redirect:/user/resource/dashboard";
+           case "[ROLE_BUSINESS]"-> "redirect:/business/resource/dashboard";
+           case "[ROLE_ADMIN]"-> "redirect:/admin/resource/dashboard";
+           default -> {
+               redirectAttributes.addFlashAttribute("failure","You need to login first");
+               yield "redirect:/common/resource/dashboard";
+           }
+       };
+       return redirectPoint;
+
+    }
 
 
 }

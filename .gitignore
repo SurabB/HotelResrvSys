@@ -28,7 +28,7 @@ Thumbs.db
 # Sensitive / local config
 # Ignore real application properties so secrets are not pushed
 /src/main/resources/application.properties
-
+.env
 
 # Other
 *.swp

@@ -1,0 +1,156 @@
+1 DATABASE DESIGN
+The database design of the Room Spot system is developed to manage users, room listings, bookings, payment efficiently. Using MySQL as the relational database and integrating with Spring Boot ensures secure, consistent, and maintainable storage while supporting the system’s core functionalities.
+
+
+Core Tables and Their Purpose
+1.	User Table
+o	Fields: userId, email, password, role, isEmailVerified, isAdminApproved, bankAccount, IsActive
+o	Ensures authentication and role-based access, allowing users to book rooms.
+
+
+2.	Business Table
+o	Fields: businessId, businessName, location, city, businessUuid, roomId, userId, imageId
+o	Stores Business Info.
+
+3.	Room Table
+o	Fields: roomId,  roomType, pricePerHour, isAvailable, businessId, imageId
+o	Stores details of rooms, including type, price, and availability.
+
+4.	Reservation Table
+o	Fields: reservationId, userId, roomId, checkIndate, checkoutDate, payment, pricePerHour, roomType
+o	Tracks room reservations and links users to rooms.
+
+
+5   History Table
+o	Fields: historyId, reservationId, roomType, bookingDate, checkInDate, checkoutDate, pricePerHour, paymentAmount,
+                createdAt, userId
+o	 Tracks bookings and checkout Status.
+
+
+6   MailToken Table
+
+o	Fields: tokenId, token, expiryDate, mailStatus, userId,mailStatus
+o	Stores verification token for registration and password reset feature.
+o	User verification through token ,send and verify using mail service
+
+
+7   Image Table
+o	Fields: imageId, imageType, image
+o	Stores images of business and rooms
+
+
+
+
+
+
+
+Database Schema Overview
+
+User->   Fields:	  userId, email, password, role, isEmailVerified, isAdminApproved, bankAccount, IsActive
+         DataTypes:  bigInt, varchar, varchar, enum, bit(1), bit(1), Decimal(10,2), tinyInt(1)
+         objective:        Stores user login info
+
+
+
+Business-> Fields:     userId, businessId, businessName, location, city, businessUuid, imageId
+	       DataTypes:  bigInt, bigInt, varchar, varchar, varchar, varchar, bigInt
+          objective:  Stores business details
+
+
+Room->    Fields: 	roomId, roomType, pricePerHour, roomIsActive, businessId, imageId
+          DataTypes:    bigInt, varchar, Decimal(10,2), bit(1), bigInt, bigInt
+          obj:          Stores room details and availability
+
+
+Reservation Table->
+           Fields:	reservationId, userId, roomId, checkInDate, checkoutDate, bookingDate, status
+           DataTypes:   bigInt, bigInt, bigInt, datetime, datetime, datetime,enum
+           objective:   stores booking information
+
+
+Reservation History->
+            Fields:	historyId, userId, roomId, reservationId, businessId, bookingDate, checkIndate, checkoutDate,
+                        paymentAmount, pricePerHour, roomType, status
+
+            DataTypes:  Bigint, bigint, bigint, bigInt, bigInt, datetime, datetime, datetime, decimal(10,2),
+                        decimal(10,2),   varchar, enum
+            objective:  Stores reservation history.
+
+MailToken ->
+
+             Fields:	tokenId, token, expiryDate, mailStatus, userId, mailStatus
+             DataTypes:	Bigint, varchar, datetime, enum, bigInt, enum
+             Objective: Stores verification token for registration and password reset.
+
+
+Image->      Fields:	imageId, imageType, image
+             DataTypes: Bigint, varchar, mediumblob
+             objective: Stores business and rooms images.
+
+
+Design Principles with Technology
+•	Relational Structure: MySQL enforces table relationships and constraints for accuracy.
+•	ORM Mapping: Spring Boot with JPA reduces repetitive SQL code by mapping tables to Java entities.
+•	Security: Spring Security ensures authentication, while MySQL stores passwords securely.
+•	Scalability: New tables or features (e.g., room analytics, promotions) can be easily added using Spring Boot framework.
+
+
+Relevance to System Context
+•	Focused on room rental and hotel booking requirements, without unnecessary ERP-level complexity.
+•	Ensures seamless interaction between frontend (HTML, CSS, Thymeleaf ) and backend services.
+•	Provides reliable storage and management for bookings, cancellation, which are essential for the Room Spot system’s daily operation.
+
+
+Entity Relationship (ER) Diagram of Room Spot
+The ER diagram illustrates the entities, their attributes, and the relationships between them in the Room Spot system:
+•	User Entity: Represents registered users of the system, including customers and business persons. Each user has a unique userID, email, role,password etc
+•	Business Entity: Each business represents a property owner’s rental organization or hotel. It includes attributes such as businessId, businessName, Location, and city.
+•	Room Entity: Contains room details like roomId, roomNumber, roomType, and price. Each room belongs to a specific business.
+•	Reservation Table: Stores customer booking details, including reservationId, paymentAmount, reservation_status, bookingDate, and checkoutDate.
+•	Reservation History: Records transaction or booking history with details like historyId, status, payamount, bookingDate, checkoutDate, and createdAt.
+•	MailToken Entity: Handles user verification tokens with attributes such as tokenId, token, expireDate, and mailstatus.
+•	Image Entity: Keeps track of image and its type. It includes attributes such as imageType, imageId and image.
+
+
+
+Relationships:
+•	A User with role Business can own single Business (1:1).
+•	A Business can have multiple Rooms (1:N).
+•	A Room can have multiple Reservations (1:N).
+•	Each Reservation can have multiple History Records (1:N).
+•	A User has one MailToken for verification (1:1).
+•	Image has one to one relationship with both business and rooms (1:1)
+
+
+2 AutoGenerated Columns:
+  User Table-> isActive
+  ReservationTable->status
+
+2.1 Generation strategy:
+    ReservationTable:status->
+
+    CREATE EVENT if not exists auto_update_reservation_status
+    ON SCHEDULE EVERY 1 MINUTE
+    DO
+    Begin
+
+
+        UPDATE reservation_table
+        SET reservation_status = 'CHECKED_IN'
+        WHERE reservation_status = 'BOOKED' AND check_in_date <= NOW();
+
+
+        UPDATE reservation_table
+        SET reservation_status = 'CHECKED_OUT'
+        WHERE reservation_status = 'CHECKED_IN' AND checkout_date <= NOW();
+
+    end$$
+    DELIMITER ;
+
+    userTable:isActive->
+
+    ALTER TABLE user_table
+    MODIFY COLUMN is_active BOOLEAN
+    GENERATED ALWAYS AS (is_email_verified AND is_admin_approved) STORED;
+
+

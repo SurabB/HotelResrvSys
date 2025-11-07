@@ -1,42 +1,60 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title th:text="${business.businessName}"> Business Page</title>
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" href="/static/css/dashboard.css">
 
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
 <style>
-    input {
-        display: inline-block;
-        margin: 10px 0;
-        padding: 10px 15px;
-        color: #fff;
-        background-color: #037bfd;
-        border-radius: 5px;
-        transition: background-color 0.2s ease;
+    #logout_button{
+        background-color:transparent;
+        border:none;
+        font-size:larger;
     }
+    #logout_div>label{
+        color:red;
+    }
+    #logout_button:hover,#logout_div>form>label:hover,#logout_div:hover{
+        background-color: #fffdfd;
+        cursor:pointer;
+        border-radius:7px;
+    }
+    #logout_div{
+        padding:3%;
+        width:66%;
+    }
+
 </style>
 </head>
 <body>
-<h1 th:text="|Welcome to Hotel ${business.businessName}|"></h1>
 
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
-</th:block>
-<br>
+
+
+<div id="all_anchors">
 <a th:href="@{/user/service/getRoom}">
     Book Room
 </a>
-<br>
-<a th:href="@{/user/service/cancelBooking}">Cancel Booking</a>
 
+<a th:href="@{/user/service/cancelBooking}"><i style="font-size:large" class="fa-solid fa-xmark"></i>Cancel Booking</a>
 
+    <div id="logout_div">
 <form th:action="@{/user/service/logout}" method="post">
-    <input type="submit" id="businessLogout" value="Logout"/>
+    <button  id="logout_button" type="submit"/><i style="color:red;" class="fa-solid fa-right-from-bracket"></i> </button><label style="color:red;" for="logout_button">Logout</label>
 </form>
+    </div>
 
-
+</div>
+<div id="main_content">
+    <th:block>
+        <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
+    </th:block>
+    <div id="dash_header">
+        <h1 th:text="|Welcome to Hotel ${business.businessName}|"></h1>
+    </div>
+    <div id="img_div"><img th:src="@{/imageProcessor/businessImage(Uuid=${business.businessUuid})}" alt="Business Image"/></div>
+</div>
 
 </body>
 </html>

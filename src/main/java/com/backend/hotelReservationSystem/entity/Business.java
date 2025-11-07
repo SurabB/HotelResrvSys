@@ -37,6 +37,9 @@ public class Business {
     @Column(name="location",nullable = false)
     private String location;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
 
 
     @OneToOne

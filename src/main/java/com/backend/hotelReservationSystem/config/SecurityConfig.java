@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Optional;
 
@@ -36,7 +38,7 @@ public class SecurityConfig {
        http
                .authorizeHttpRequests(request->
                    request
-                           .requestMatchers("/css/**").permitAll()
+                           .requestMatchers("/css/**","/image/**").permitAll()
                            .requestMatchers("/user/resource/reg","/business/resource/reg").permitAll()
                            .requestMatchers("/common/resource/**").permitAll()
                            .anyRequest().authenticated()
@@ -90,6 +92,20 @@ public class SecurityConfig {
     @Bean
     public static ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
         return new ServletListenerRegistrationBean<>(new HttpSessionEventPublisher());
+    }
+
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer(){
+        return new WebMvcConfigurer(){
+            @Override
+            public void addCorsMappings(CorsRegistry corsRegistry){
+             corsRegistry.addMapping("/**")
+                     .allowedOrigins("http://localhost:8080")
+                     .allowedMethods("GET","POST");
+            }
+
+        };
+
     }
 
 

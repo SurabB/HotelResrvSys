@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+    <link rel="stylesheet"th:href="@{/css/uploadImage.css}" href="/static/css/uploadImage.css">
+
+</head>
+<body>
+<div id="container">
+<h1>Upload an Image</h1>
+<form id="upload" th:action="@{/imageProcessor/uploadRoomImage}" method="post" enctype="multipart/form-data">
+    <label for="imageFile">Select Image:</label>
+    <input type="file" value="upload Image" id="imageFile" name="imageFile" required>
+    <button type="submit">Upload</button>
+    <th:block>
+        <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
+    </th:block>
+</form>
+</div>
+
+    <a id="back" th:href="@{/business/resource/dashboard}">Back</a>
+
+</body>
+</html>

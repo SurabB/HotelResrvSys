@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Business Reg</title>
-    <link rel="stylesheet" th:href="@{/css/login.css}" href="../static/css/login.css"/>
+    <link rel="stylesheet" th:href="@{/css/login.css}" href="/static/css/login.css"/>
 </head>
-<body class="flex">
+<body style="flex-direction:column;" class="flex">
 <form th:action="@{/business/service/businessReg}" method="post">
 
     <div id="container" class="flex ">
@@ -14,21 +14,24 @@
             <label for="businessName">Business Name </label>
             <input class="form_container_child" type="text" id="businessName" name="businessName" placeholder="Enter business Name" required/>
         </div>
-        <div id="pass_div" class="flex form_container">
+        <div  id="pass_div" class="flex form_container">
             <label for="city">City </label>
-            <input class="form_container_child" type="text" id="city" name="city" placeholder="Enter City Name" required />
+            <input style="margin-left:21%;" class="form_container_child" type="text" id="city" name="city" placeholder="Enter City Name" required />
         </div>
         <div id="location_div" class="flex form_container">
             <label for="location">Location </label>
-            <input class="form_container_child" type="text" id="location" name="location" placeholder="Enter Business Location" required />
+            <input style="margin-left:12%"; class="form_container_child" type="text" id="location" name="location" placeholder="Enter Business Location" required />
         </div>
-        <div id="submit_div">
+        <div style="margin-left:20%;" id="submit_div">
             <button type="submit">Register</button>
         </div>
+        <th:block>
+            <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
+        </th:block>
     </div>
 </form>
 <br>
-<a th:href="@{/business/resource/dashboard}">Back</a>
+<a style="margin-right:42%;" id="back" th:href="@{/business/resource/dashboard}">Back</a>
 <br>
 </body>
 </html>

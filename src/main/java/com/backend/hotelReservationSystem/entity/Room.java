@@ -38,6 +38,11 @@ public class Room {
     @Column(nullable = false,name = "room_is_active")
     private  Boolean roomIsActive;
 
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="business_id",
     foreignKey = @ForeignKey(name="FK_Own_Room_businessId__Business_businessId"))

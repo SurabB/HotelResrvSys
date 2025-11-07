@@ -6,18 +6,20 @@
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
-<body class="flex">
-<form th:action="@{/business/service/addRoom}" method="post">
+<body style="display:flex;flex-direction:column;" class="flex">
 
     <div id="container" class="flex ">
+        <form th:action="@{/business/service/addRoom}" method="post">
+         <div>
         <h1>Add Rooms </h1>
+            </div>
         <div id="roomNo_div" class="flex form_container">
             <label for="roomNumber">Room No </label>
-            <input class="form_container_child" type="number" id="roomNumber" th:field="${roomAcceptor.roomNumber}" placeholder="Enter Room Number" required/>
+            <input style="width:75%;" class="form_container_child" type="number" id="roomNumber" th:field="${roomAcceptor.roomNumber}" placeholder="Enter Room Number" required/>
         </div>
         <div id="pricePerHour_div" class="flex form_container">
             <label for="pricePerHour">Price Per hour </label>
-            <input class="form_container_child" type="number" step="0.01" id="pricePerHour" th:field="${roomAcceptor.pricePerHour}" placeholder="Enter Price per hour" required />
+            <input style="width:100%;" class="form_container_child" type="number" step="0.01" id="pricePerHour" th:field="${roomAcceptor.pricePerHour}" placeholder="Enter Price per hour" required />
         </div>
         <div id="roomType_div" class="flex form_container">
             <label for="roomType">Room Type </label>
@@ -27,16 +29,20 @@
             <label for="isActive">Is Active </label>
             <input class="form_container_child" type="checkbox" id="isActive" th:field="${roomAcceptor.active}" placeholder="Enter Room type"/>
         </div>
-        <div id="submit_div">
+        <div id="submit_div" style="margin-left:20%;">
             <button type="submit">Add Room</button>
         </div>
-    </div>
 </form>
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
-</th:block>
-<br>
-<a th:href="@{/business/resource/dashboard}">Back</a>
-<br>
+        <th:block>
+            <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
+        </th:block>
+    </div>
+
+
+
+
+<a style="margin-right:40%;" id="back" th:href="@{/business/resource/dashboard}">Back</a>
+
+
 </body>
 </html>

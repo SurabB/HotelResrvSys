@@ -14,7 +14,7 @@ table {
 }
 
 th {
-    background-color: #007bff;
+    background-color: #2c3e50;
     color: white;
     padding: 12px;
     text-align: center;
@@ -33,7 +33,7 @@ input[type="number"], input[type="text"] {
     border-radius: 4px;
 }
 
-button {
+button,#imageFile {
     background-color: #28a745;
     color: white;
     border: none;
@@ -42,7 +42,20 @@ button {
     cursor: pointer;
     transition: background-color 0.2s;
 }
+#imageDisplay{
+    max-width:10rem;
+    max-height:10rem;
 
+}
+#imageDisplay>img{
+    height:100%;
+    width:100%;
+    max-height:100%;
+    max-width:100%;
+    background-size:cover;
+    background-position: center; /* Centers the image within the div */
+    background-repeat: no-repeat;
+}
 button:hover {
     background-color: #218838;
 }
@@ -59,12 +72,12 @@ a {
 }
 
 a:hover {
-    background-color: #0056b3;
+    background-color: #2c3e50;
     color:white;
 }
 
 .active-Page{
-    background-color:blue;
+    background-color:#2c3e50;
     color:white
 }
 
@@ -74,4 +87,14 @@ h1 {
 }
 input::placeholder {
     color:black;
+}
+#pagination_display{
+  margin-left:40%;
+    margin-top:2%;
+}
+#back{
+    margin-left:16%;
+}
+#successFailure_div{
+    margin-left:30%;
 }

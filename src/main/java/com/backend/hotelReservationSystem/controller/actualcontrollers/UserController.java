@@ -76,12 +76,13 @@ public class UserController {
             redirectAttributes.addFlashAttribute("failure", firstError);
             return "redirect:/user/service/getBusiness";
         }
-        redirectAttributes.addAttribute("pageNo",pageNo);
+
 
         // 1 findBusinessDto-> businessName,city,location (combined unique in db)
         // 2 find businesses having provided credentials.
         Optional<Business> business = userService.findBusiness(findbusinessdto);
         if(business.isEmpty()) {
+            redirectAttributes.addAttribute("pageNo",pageNo);
             redirectAttributes.addFlashAttribute("failure", "Business does not exist");
             return "redirect:/user/service/getBusiness";
         }
@@ -205,7 +206,6 @@ catch (Exception e) {
 
             // 2 books room based on above credentials
            userService.bookRoom(roomBook,user,business.getBusinessId());
-            System.out.println("in room book post success"+time);
             redirectAttributes.addFlashAttribute("success", "Room booked successfully");
             return "redirect:/user/service/bookRoom";
         }

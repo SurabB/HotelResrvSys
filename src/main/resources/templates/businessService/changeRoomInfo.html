@@ -8,8 +8,8 @@
 </head>
 <body>
 
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+<th:block>
+    <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
 </th:block>
 
 <table th:if="${allRooms.size() > 0}">
@@ -49,13 +49,16 @@
             </form>
         </th>
         <th> Change Status</th>
+        <th>Room</th>
+        <th>change Image</th>
         <th>Change Room Info</th>
     </tr>
     </thead>
 
     <tbody>
     <tr th:each="room, stat : ${allRooms}">
-        <form th:action="@{/business/service/changeRoomInfo}" method="post">
+        <form th:action="@{/business/service/changeRoomInfo}" method="post"  enctype="multipart/form-data">
+
             <td th:text="${stat.count}"></td>
             <td th:text="${room.roomNumber}"></td>
 
@@ -68,9 +71,13 @@
                        th:value="${room.roomIsActive}"
                        th:checked="false" />
             </td>
+            <td><div id="imageDisplay"><img th:src="@{/imageProcessor/displayRoomImage(roomNo=${room.roomNumber})}" alt="Image Not available" /></div></td>
+
+            <td>
+                <input type="file" value="upload Image" id="imageFile" name="multipartFile">
+            </td>
 
             <td><button type="submit">Change Room Info</button></td>
-
             <input type="hidden" name="activeRoomNumber" th:value="${room.roomNumber}">
             <input type="hidden" name="pageNo" th:value="${paginationReceiver.pageNo}">
 
@@ -79,6 +86,7 @@
 
     </tbody>
 </table>
+<div id="pagination_display">
 <th:block th:if="${allRooms.size()>0}">
 
     <th:block
@@ -86,9 +94,12 @@
 
     </th:block>
 </th:block>
+</div>
 <br>
+<div id="back">
 <a th:href="@{/business/resource/dashboard}">Back</a>
-<br>
+</div>
+
 
 <h1 th:if="${allRooms.size() == 0}" style="color: red;">
     All rooms are booked. Can't change Room information

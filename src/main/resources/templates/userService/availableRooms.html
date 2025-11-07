@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Show available Rooms</title>
-    <link rel="stylesheet" th:href="@{/css/table.css}"/>
+    <link rel="stylesheet" th:href="@{/css/table.css}" href="/static/css/table.css">
 
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
 </head>
 <body>
 
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+<th:block>
+    <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
 </th:block>
 <p th:if="${availableRooms.size() > 0}" style="color:dodgerblue; font-weight:bolder;" th:text="|CheckInTime time - Checkout Time:${checkInDate} to ${checkoutDate}|"></p>
 <table th:if="${availableRooms.size() > 0}">
         <tr>
             <th>SNo</th>
+            <th>Images</th>
             <th>RoomNo</th>
             <th>Room Type
                 <form th:action="@{/user/service/bookRoom}" method="get">
@@ -44,6 +45,7 @@
 
         <tr th:each="room, iterStat : ${availableRooms}">
             <td th:text="${iterStat.count}"></td>
+       <td><div id="imageDisplay"><img th:src="@{/imageProcessor/displayRoomImage(Uuid=${business.businessUuid}, roomNo=${room.key.roomNumber})}" alt="Image Not available" /></div></td>
             <td th:text="${room.key.roomNumber}"></td>
             <td th:text="${room.key.roomType}"></td>
             <td th:text="${room.key.pricePerHour}"></td>
@@ -67,7 +69,7 @@
 
 
 </table>
-<div th:if="${availableRooms.size()>0}"><!-- Previous -->
+<div id="pagination_display" th:if="${availableRooms.size()>0}">
     <span th:if="${!paginationReceiver.isFirst(paginationReceiver.pageNo)}">
     <a  th:href="@{/user/service/bookRoom(
     pageNo=${paginationReceiver.pageNo - 1},
@@ -78,7 +80,7 @@
     </a>
   </span>
 
-    <!-- Page Numbers -->
+
     <span th:each="index : ${paginationReceiver.indexes()}">
   <a th:href="@{/user/service/bookRoom(
       pageNo=${index},
@@ -90,7 +92,6 @@
 </a>
   </span>
 
-    <!-- Next -->
     <span th:if="${!paginationReceiver.isLast(paginationReceiver.pageNo)}">
     <a th:href="@{/user/service/bookRoom(
        pageNo=${paginationReceiver.pageNo + 1},
@@ -103,8 +104,10 @@
 
 </div>
 <br>
+<div id="back">
 <a th:href="@{/user/service/businessPage}">Back</a>
-<br>
+</div>
+
 <h1 th:if="${availableRooms.size()==0}" style="color: green;">No rooms are available for booking</h1>
 </body>
 </html>

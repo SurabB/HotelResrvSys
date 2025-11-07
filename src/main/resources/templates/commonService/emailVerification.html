@@ -12,26 +12,28 @@
         }
     </style>
 </head>
-<body class="flex">
+<body style="display:flex; flex-direction:column;" class="flex">
 <form  method="post" th:action="@{/common/resource/verifyEmail}">
 
-    <div id="container" class="flex ">
+    <div  id="container" class="flex ">
         <h1>Verify Email</h1>
         <div id="verificationToken_div" class="flex form_container">
             <label for="verificationToken">Verification Token:</label>
             <input class="form_container_child" type="text" id="verificationToken" name="verificationToken" placeholder="Enter your VerificationToken" required/>
         </div>
         <div id="pass_div" class="flex form_container">
-            <label for="password">Password </label>
-            <input class="form_container_child" type="password" id="password" name="password" placeholder="Enter Password" required />
+            <label  for="password">Password </label>
+            <input style="width:65%;height:70%;margin-left:50px;"  class="form_container_child" type="password" id="password" name="password" placeholder="Enter Password" required />
         </div>
-        <div id="submit_div">
+        <div style="margin-left:25%;margin-top:20px; width:55%;" id="submit_div">
             <button type="submit">Verify</button>
         </div>
-        <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-            <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+        <th:block>
+            <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
         </th:block>
     </div>
 </form>
+<a style="margin-right:40%;" id="back"  th:href="@{/common/resource/dashboard}">Back</a>
+
 </body>
 </html>

@@ -1,14 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Home Page</title>
 </head>
 <body>
-<h1> Welcome to Hotel Reservation System</h1>
-<a th:href="@{/common/resource/login}">Login</a>
-<a th:href="@{/common/resource/reg}">Register as User </a>
-<a th:href="@{/business/resource/reg}">Register as Business</a>
+<div id="all_anchors">
+<a th:href="@{/common/resource/login}"><i class="fa-solid fa-user-lock"></i></i> Login</a>
+<a th:href="@{/common/resource/reg}"><i class="fa-solid fa-user-plus"></i></i>Register as User </a>
+<a th:href="@{/business/resource/reg}"><i class="fa-solid fa-user-tie"></i></i>Register as Business</a>
+<a th:href="@{/common/resource/roleBasedDashboard}"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
+</div>
+<div id="main_content">
+
+    <div id="dash_header">
+    <h1> Welcome to Hotel Reservation System</h1>
+</div>
+    <th:block>
+        <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
+    </th:block>
+    <div id="img_div"><img th:src=@{~/image/commonDash.jpg} alt="Hotel Pic"></div>
+</div>
 </body>
+</div>
 </html>

@@ -29,13 +29,15 @@
             <label for="checkoutTime">Checkout Time </label>
             <input class="form_container_child" type="text" id="checkoutTime" name="checkoutTime" placeholder="Enter checkout Time" required />
         </div>
-        <div id="submit_div">
+        <div style="margin-left:20%" id="submit_div">
             <button type="submit">Submit</button>
         </div>
-        <th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-            <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+        <th:block>
+            <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
         </th:block>
     </div>
+    <a id="back" th:href="@{/user/service/businessPage}">Back</a>
+
 
 </form>
 </body>

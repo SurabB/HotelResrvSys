@@ -8,8 +8,8 @@
 </head>
 <body>
 
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+<th:block>
+    <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
 </th:block>
 
 <table th:if="${bookedRooms.size() > 0}">
@@ -95,6 +95,7 @@
     </tbody>
 
 </table>
+<div id="pagination_display">
 <th:block th:if="${bookedRooms.size()>0}">
 
     <th:block
@@ -102,9 +103,10 @@
 
     </th:block>
 </th:block>
-<br>
+</div>
+<div id="back">
 <a th:href="@{/business/resource/dashboard}">Back</a>
-<br>
+</div>
 <h1 th:if="${bookedRooms.size()==0}" style="color: red;">No Active Bookings </h1>
 </body>
 </html>

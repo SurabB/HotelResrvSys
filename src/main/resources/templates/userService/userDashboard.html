@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>User Dashboard</title>
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" href="/static/css/dashboard.css">
     <link rel="stylesheet" th:href="@{/css/successFailureFragment.css}">
 </head>
 <body>
-<th:block th:with="margins=${ {'0px','0px','0px','60px'} }">
-    <div th:replace="~{fragments/successFailureFragment :: successFailureFragment(${margins})}"></div>
+<th:block>
+    <div id="successFailure_div" th:replace="~{fragments/successFailureFragment :: successFailureFragment()}"></div>
 </th:block>
-<a th:href="@{/user/service/getBusiness}">Select Hotels</a>
-<br>
-<div>
-    <a th:href="@{/common/resource/dashboard}">Home</a>
+<div id="all_anchors">
+<a th:href="@{/user/service/getBusiness}"><i class="fa-solid fa-check"></i>Select Hotels</a>
+    <a th:href="@{/common/resource/dashboard}"><i class="fa-solid fa-house"></i>Home</a>
+<a style="color:red" th:href="@{/common/resource/logout}"><i style="color:red;" class="fa-solid fa-right-to-bracket"></i>Logout</a>
 </div>
-<a th:href="@{/common/resource/logout}">Logout</a>
-<br>
+<div id="main_content">
+    <div id="dash_header">
+        <h1>User Dashboard</h1>
+    </div>
+    <div id="img_div">
+    <img th:src=@{~/image/commonDash.jpg} alt=" Room spot Pic">
+    </div>
+</div>
 </body>
 </html>

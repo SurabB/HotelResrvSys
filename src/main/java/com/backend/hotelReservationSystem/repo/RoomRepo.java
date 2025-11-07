@@ -1,18 +1,16 @@
 package com.backend.hotelReservationSystem.repo;
 
-import com.backend.hotelReservationSystem.entity.ReservationTable;
 import com.backend.hotelReservationSystem.entity.Room;
+import com.backend.hotelReservationSystem.entity.Image;
 import com.backend.hotelReservationSystem.enums.ReservationStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,7 +20,7 @@ public interface RoomRepo extends JpaRepository<Room,Long> {
     Page<Room> findAvailableRoomsByUuid(String businessUuid, LocalDateTime checkInDate, LocalDateTime checkoutDate, ReservationStatus booked, ReservationStatus checkedIn, Pageable pageable);
 
     @Query("select r from Room r join r.business b join b.user u where u.email=:userEmail and u.isActive=true")
-    Page<Room> findRoomByBusinessEmail(String userEmail, ReservationStatus reservationStatus,Pageable pageable);
+    Page<Room> findRoomByBusinessEmail(String userEmail,Pageable pageable);
 
     @Query("select r from Room r join r.business b join b.user u where b.businessId=:businessId and r.roomNumber=:roomNo and u.isActive=true and r.roomIsActive=true and not exists (select 1 from ReservationTable rt where rt.room=r and rt.checkInDate<:checkoutDate and rt.checkoutDate>:checkInDate and (rt.status=:booked or rt.status=:checkedIn))")
     Optional<Room> findRoomExistence(Long businessId, Long roomNo, LocalDateTime checkInDate, LocalDateTime checkoutDate, ReservationStatus booked, ReservationStatus checkedIn);
@@ -35,4 +33,9 @@ public interface RoomRepo extends JpaRepository<Room,Long> {
     @Query("select r from Room r join r.business b join b.user u where r.roomNumber=:roomNumber and u.email=:businessEmail and u.isActive=true")
     Optional<Room> findParticularRoomByBusinessEmail(Long roomNumber, String businessEmail);
 
+    @Query("select r.image from Room r join r.business b where b.businessUuid=:uuid and r.roomNumber=:roomNo")
+    Optional<Image> findRoomImageByBusinessUuid(String uuid,Long roomNo);
+
+    @Query("select r.image from Room r join r.business b join b.user u where u.email=:email and u.isActive=true and r.roomNumber=:roomNo")
+    Optional<Image> findRoomImageByBusinessEmail(String email,Long roomNo);
 }

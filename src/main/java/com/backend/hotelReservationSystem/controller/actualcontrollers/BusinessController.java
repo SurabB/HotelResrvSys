@@ -11,6 +11,7 @@ import com.backend.hotelReservationSystem.exceptionClasses.CustomMethodArgFailed
 import com.backend.hotelReservationSystem.service.actualservice.BusinessService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.MultipartStream;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -88,7 +90,6 @@ public class BusinessController {
             return "redirect:/business/service/addRoom";
         }
         catch (Exception ex) {
-            System.out.println(ex.getMessage());
                 redirectAttributes.addFlashAttribute("failure", "Something went wrong on server side.");
                 return "redirect:/business/service/addRoom";
         }
@@ -127,6 +128,10 @@ public class BusinessController {
                 return "redirect:/business/service/changeRoomInfo";
             }
             redirectAttributes.addFlashAttribute("failure", "invalid credentials.");
+            return "redirect:/business/service/changeRoomInfo";
+        }
+        catch (MultipartStream.MalformedStreamException e){
+            redirectAttributes.addFlashAttribute("failure", e.getMessage());
             return "redirect:/business/service/changeRoomInfo";
         }
         catch (Exception ex) {
