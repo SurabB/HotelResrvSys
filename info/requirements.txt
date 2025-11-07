@@ -1,0 +1,80 @@
+ 1 Functional Requirements
+
+A	User Registration and Authentication:
+1.	Customers, business persons, and administrators must be able to register and log in securely.
+2.	Passwords are stored in hashed format.
+
+
+B	Role-Based Access Control:
+1.	Customers: Search, book, and manage bookings.
+2.	Business Persons: Create and manage property listings.
+3.	Administrators: Verify listings, manage users, and monitor system activities.
+
+C	Property Listing and Management:
+1.	Business persons can add property details such as room type, location, price, and availability.
+2.	They can edit or disable their listings at any time.
+
+D	Sorting and Pagination Feature:
+1.	Customers can sort based on price range, type (room).
+2.	Pages can be divided to avoid querying large set of data.
+
+
+E	Booking and Reservation:
+1.	Customers can book available rooms with automated confirmation.
+2.	Cancellation options are available under certain conditions.
+
+F	Dashboards:
+1.	Customers: View bookings, cancel or early checkout reservations.
+2.	Business Persons: Manage their listings and track bookings.
+3.	Administrators: Approves and Disapproves user.
+
+G	Verification and Security:
+ System prevents unauthorized access with secure sessions.
+
+
+H	Reporting and Monitoring:
+ Generate reports such as total bookings and active listings.
+
+
+2 Modules:
+
+2.1 User module:
+
+a. Register/Login to the system.
+b. Search for available rooms.
+c. Book/cancel  reservations.
+d. View  booking details.
+
+
+2.2 Admin module:
+a. Manage users(approve/disapprove accounts).
+b. Manage business(approve/disapprove other parties).
+
+2.3 Business Module:
+a.  Add hotel rooms.
+b.  Can change room info like room price, room type and availability status at anytime.
+c.  Can add ,modify or remove rooms and business images.
+d.  View reservation statistics.
+
+2.4 Registration Process:
+User, Businesses and Admin needs to get registered and should verify their email account before login in to the system.
+Newly added Admin and Businesses needs to get admin permission before login into the system.
+
+Overall the users are the individuals who will see availability of rooms, login into our system. Books room, use services .Admin are responsible to manage users and businesses that are involved in our application.
+Admin can disapprove both users and business if they violate rules and protocols and business are external parties that use the platform to promote their services and facilities.
+
+3 Limitations:
+a. The system runs only on localhost, not on the internet.
+b. Limited to basic booking features(no online payment,no notification).
+c. Cannot be accessed from mobile phones(only desktop).
+
+
+
+
+
+
+
+
+
+
+
